@@ -32,6 +32,7 @@ import java.util.List;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.standard.ClassicTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.junit.Test;
 
@@ -57,6 +58,9 @@ public class ChineseAnalyzerTests  {
             }
             System.out.println("1 " + String.join(" ", expected));
             System.out.println("2 " + String.join(" ", termList) + "\n");
+            for (String term: termList) {
+                System.out.println(term +": " + term.getBytes().length + " bytes, but length of string is:" + term.length());
+            }
             assertThat(termList, is(expected));
         } catch (IOException e) {
             assertTrue(false);
@@ -64,15 +68,15 @@ public class ChineseAnalyzerTests  {
     }
     
     @Test
-    public void test1() throws IOException
+    public void test2() throws IOException
     {
-        System.out.println("test1");
-        String input = "二親歸依三寶。時從大德調伏軍教誦四阿";
+        String input = "𪘁  \u2A601  如抜範浪偃壅國  二親歸依三寶。時從大德調!伏軍教誦四阿";
         Reader reader = new StringReader(input);
-        List<String> expected = Arrays.asList("");
+        List<String> expected = Arrays.asList("二", "親", "歸", "依", "三", "寶", "時", "從",
+                "大", "德", "調", "伏", "軍", "教", "誦", "四", "阿");
         System.out.println("0 " + input);
-        CnTokenizer cnTokenizer = new CnTokenizer();
-        TokenStream words = tokenize(reader, cnTokenizer);
+        Tokenizer tok = new ClassicTokenizer();
+        TokenStream words = tokenize(reader, tok);
         assertTokenStream(words, expected);
     }
 }

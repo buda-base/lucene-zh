@@ -35,8 +35,7 @@ public class CnTokenizer extends CharTokenizer {
   
   @Override
   protected boolean isTokenChar(int c) {
-      
-      return true;
+      return (char) c != ' ' && (char) c != '。';
   }
   
   /**

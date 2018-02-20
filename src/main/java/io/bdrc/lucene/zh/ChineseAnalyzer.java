@@ -22,9 +22,10 @@ package io.bdrc.lucene.zh;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.standard.ClassicTokenizer;
 
 /**
- * An Analyzer that uses {@link CnTokenizer}.
+ * An Analyzer that uses {@link ClassicTokenizer}.
  **/
 public final class ChineseAnalyzer extends Analyzer {
   
@@ -36,7 +37,7 @@ public final class ChineseAnalyzer extends Analyzer {
   
   @Override
   protected TokenStreamComponents createComponents(final String fieldName) {
-      Tokenizer token = new CnTokenizer();
+      Tokenizer token = new ClassicTokenizer();
       
       return new TokenStreamComponents(token);
   }
