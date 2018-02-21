@@ -32,7 +32,6 @@ import java.util.List;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.junit.Test;
 
@@ -65,9 +64,9 @@ public class ChineseAnalyzerTests  {
     }
     
     @Test
-    public void test2() throws IOException
+    public void test1() throws IOException
     {
-        String input = "𪘁!  如是我聞。一時佛在羅閱祇耆闍崛山中。與大比丘眾千二百五十人菩薩五千人俱\n" + 
+        String input = "𪘁! this is a test. 如是我聞。japanese: ひらがな 一時佛在羅閱祇耆闍崛山中。與大比丘眾千二百五十人菩薩五千人俱\n" + 
                 "。";
         System.out.println(input.toCharArray());
         Reader reader = new StringReader(input);
@@ -75,7 +74,7 @@ public class ChineseAnalyzerTests  {
                 "在1", "羅1", "閱1", "祇1", "耆1", "闍1", "崛1", "山1", "中1", "與1", "大1", "比1", "丘1", "眾1", 
                 "千1", "二1", "百1", "五1", "十1", "人1", "菩1", "薩1", "五1", "千1", "人1", "俱1");
         System.out.println("0 " + input);
-        Tokenizer tok = new StandardTokenizer();
+        Tokenizer tok = new CnFilteringTokenizer();
         TokenStream words = tokenize(reader, tok);
         assertTokenStream(words, expected);
     }
