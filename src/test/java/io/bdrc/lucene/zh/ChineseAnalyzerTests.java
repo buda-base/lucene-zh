@@ -32,7 +32,7 @@ import java.util.List;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.standard.ClassicTokenizer;
+import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.junit.Test;
 
@@ -54,13 +54,10 @@ public class ChineseAnalyzerTests  {
             List<String> termList = new ArrayList<String>();
             CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
             while (tokenStream.incrementToken()) {
-                termList.add(charTermAttribute.toString());
+                termList.add(charTermAttribute.toString() + charTermAttribute.length());
             }
             System.out.println("1 " + String.join(" ", expected));
             System.out.println("2 " + String.join(" ", termList) + "\n");
-            for (String term: termList) {
-                System.out.println(term +": " + term.getBytes().length + " bytes, but length of string is:" + term.length());
-            }
             assertThat(termList, is(expected));
         } catch (IOException e) {
             assertTrue(false);
@@ -70,12 +67,15 @@ public class ChineseAnalyzerTests  {
     @Test
     public void test2() throws IOException
     {
-        String input = "𪘁  \u2A601  如抜範浪偃壅國  二親歸依三寶。時從大德調!伏軍教誦四阿";
+        String input = "𪘁!  如是我聞。一時佛在羅閱祇耆闍崛山中。與大比丘眾千二百五十人菩薩五千人俱\n" + 
+                "。";
+        System.out.println(input.toCharArray());
         Reader reader = new StringReader(input);
-        List<String> expected = Arrays.asList("二", "親", "歸", "依", "三", "寶", "時", "從",
-                "大", "德", "調", "伏", "軍", "教", "誦", "四", "阿");
+        List<String> expected = Arrays.asList("𪘁2", "如1", "是1", "我1", "聞1", "一1", "時1", "佛1", 
+                "在1", "羅1", "閱1", "祇1", "耆1", "闍1", "崛1", "山1", "中1", "與1", "大1", "比1", "丘1", "眾1", 
+                "千1", "二1", "百1", "五1", "十1", "人1", "菩1", "薩1", "五1", "千1", "人1", "俱1");
         System.out.println("0 " + input);
-        Tokenizer tok = new ClassicTokenizer();
+        Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);
         assertTokenStream(words, expected);
     }
