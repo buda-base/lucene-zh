@@ -20,32 +20,35 @@
 package io.bdrc.lucene.zh;
 
 
-import org.apache.lucene.analysis.Analyzer;
+import java.io.IOException;
+
+import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.standard.StandardTokenizer;
+import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
 /**
- * A Chinese Analyzer that uses {@link StandardTokenizer}
- * and {@link CnOnlyFilter} to only keep Chinese tokens.
- * 
- * The produced tokens are individual ideograms.
+ * Filters all tokens whose type is not "<IDEOGRAPHIC>" or "<CJ>",
+ * the types produced by {@link StandardFilter} for Chinese tokens.
  * 
  * @author Hélios Hildt
- **/
-public final class ChineseAnalyzer extends Analyzer {
-  
-  /**
-   * Creates a new {@link ChineseAnalyzer}
-   */
-  public ChineseAnalyzer() {
+ */
+public class CnOnlyFilter extends TokenFilter {
+
+  public CnOnlyFilter(TokenStream in) {
+    super(in);
   }
   
+  protected TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
+  
   @Override
-  protected TokenStreamComponents createComponents(final String fieldName) {
-      TokenStream tokenStream = new StandardTokenizer();
-      tokenStream = new CnOnlyFilter(tokenStream);
-      
-      return new TokenStreamComponents((Tokenizer) tokenStream);
+  public final boolean incrementToken() throws IOException {
+      while (input.incrementToken()) {
+          if (typeAtt.type().equals("<IDEOGRAPHIC>") || typeAtt.type().equals("<CJ>")) {
+              return true;
+          } else {
+              continue;
+          }
+      }
+      return false;
   }
 }

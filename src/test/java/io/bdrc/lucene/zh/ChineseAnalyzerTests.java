@@ -32,11 +32,14 @@ import java.util.List;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.junit.Test;
 
 /**
- * Unit tests for the Sanskrit tokenizers and filters.
+ * Unit tests for the Chinese tokenizers and filters.
+ * 
+ * @author Hélios Hildt
  */
 public class ChineseAnalyzerTests  {
 
@@ -74,8 +77,9 @@ public class ChineseAnalyzerTests  {
                 "在1", "羅1", "閱1", "祇1", "耆1", "闍1", "崛1", "山1", "中1", "與1", "大1", "比1", "丘1", "眾1", 
                 "千1", "二1", "百1", "五1", "十1", "人1", "菩1", "薩1", "五1", "千1", "人1", "俱1");
         System.out.println("0 " + input);
-        Tokenizer tok = new CnFilteringTokenizer();
+        Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);
-        assertTokenStream(words, expected);
+        TokenStream cnOnly = new CnOnlyFilter(words);
+        assertTokenStream(cnOnly, expected);
     }
 }
