@@ -125,6 +125,7 @@ public class ChineseAnalyzerTests  {
     @Test
     public void testPinyin() throws IOException
     {
+        // https://github.com/axgle/pinyin/blob/master/pinyin_test.go
         String input = "世界 中文 汉字 拼音 简体字 莞 濮 泸 漯 亳 儋";
         Reader reader = new StringReader(input);
         List<String> expected = Arrays.asList("shìjiè", "zhōngwén", "hànzì", "pīnyīn", 
