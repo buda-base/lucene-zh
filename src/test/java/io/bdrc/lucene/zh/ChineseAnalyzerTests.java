@@ -51,12 +51,27 @@ public class ChineseAnalyzerTests  {
         return tokenizer;
     }
     
-    static private void assertTokenStream(TokenStream tokenStream, List<String> expected) {
+    static private void assertCharTokenStream(TokenStream tokenStream, List<String> expected) {
         try {
             List<String> termList = new ArrayList<String>();
             CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
             while (tokenStream.incrementToken()) {
                 termList.add(charTermAttribute.toString() + charTermAttribute.length());
+            }
+            System.out.println("1 " + String.join(" ", expected));
+            System.out.println("2 " + String.join(" ", termList) + "\n");
+            assertThat(termList, is(expected));
+        } catch (IOException e) {
+            assertTrue(false);
+        }
+    }
+    
+    static private void assertTokenStream(TokenStream tokenStream, List<String> expected) {
+        try {
+            List<String> termList = new ArrayList<String>();
+            CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
+            while (tokenStream.incrementToken()) {
+                termList.add(charTermAttribute.toString());
             }
             System.out.println("1 " + String.join(" ", expected));
             System.out.println("2 " + String.join(" ", termList) + "\n");
@@ -79,7 +94,7 @@ public class ChineseAnalyzerTests  {
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);
         TokenStream cnOnly = new CnOnlyFilter(words);
-        assertTokenStream(cnOnly, expected);
+        assertCharTokenStream(cnOnly, expected);
     }
     
     @Test
@@ -90,20 +105,34 @@ public class ChineseAnalyzerTests  {
                 + "人事間最痛苦的事莫過於此。如果上天能夠給我一個再來一次得機會，我會對那個女孩子說三個字，"
                 + "我愛你。如果非要在這份愛上加個期限，我希望是，一萬年。";
         Reader reader = new StringReader(input);
-        List<String> expected = Arrays.asList("曾1", "经1", "有1", "一1", "份1", "真1", "诚1", 
-                "的1", "爱1", "情1", "放1", "在1", "我1", "面1", "前1", "我1", "没1", "有1", "珍1", 
-                "惜1", "等1", "我1", "失1", "去1", "的1", "时1", "候1", "我1", "才1", "后1", "悔1", 
-                "莫1", "及1", "人1", "事1", "间1", "最1", "痛1", "苦1", "的1", "事1", "莫1", "过1", 
-                "于1", "此1", "如1", "果1", "上1", "天1", "能1", "够1", "给1", "我1", "一1", "个1", 
-                "再1", "来1", "一1", "次1", "得1", "机1", "会1", "我1", "会1", "对1", "那1", "个1", 
-                "女1", "孩1", "子1", "说1", "三1", "个1", "字1", "我1", "爱1", "你1", "如1", "果1", 
-                "非1", "要1", "在1", "这1", "份1", "爱1", "上1", "加1", "个1", "期1", "限1", "我1", 
-                "希1", "望1", "是1", "一1", "万1", "年1");
+        List<String> expected = Arrays.asList("曾", "经", "有", "一", "份", "真", "诚", 
+                "的", "爱", "情", "放", "在", "我", "面", "前", "我", "没", "有", "珍", 
+                "惜", "等", "我", "失", "去", "的", "时", "候", "我", "才", "后", "悔", 
+                "莫", "及", "人", "事", "间", "最", "痛", "苦", "的", "事", "莫", "过", 
+                "于", "此", "如", "果", "上", "天", "能", "够", "给", "我", "一", "个", 
+                "再", "来", "一", "次", "得", "机", "会", "我", "会", "对", "那", "个", 
+                "女", "孩", "子", "说", "三", "个", "字", "我", "爱", "你", "如", "果", 
+                "非", "要", "在", "这", "份", "爱", "上", "加", "个", "期", "限", "我", 
+                "希", "望", "是", "一", "万", "年");
         System.out.println("0 " + input);
         Reader sc = new TC2SCFilter(reader);
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(sc, tok);
         TokenStream cnOnly = new CnOnlyFilter(words);
         assertTokenStream(cnOnly, expected);
+    }
+    
+    @Test
+    public void testPinyin() throws IOException
+    {
+        String input = "世界 中文 汉字 拼音 简体字 莞 濮 泸 漯 亳 儋";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("shìjiè", "zhōngwén", "hànzì", "pīnyīn", 
+                "jiǎntǐzì", "guǎn", "pú", "lú", "luò", "bó", "dān");
+        System.out.println("0 " + input);
+        Reader pinyin = new PinyinFilter(reader);
+        Tokenizer tok = new StandardTokenizer();
+        TokenStream words = tokenize(pinyin, tok);
+        assertTokenStream(words, expected);
     }
 }
