@@ -24,45 +24,64 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
+import java.util.HashMap;
 
-import org.apache.lucene.analysis.charfilter.MappingCharFilter;
-import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
+import org.apache.lucene.analysis.TokenFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 /**
- * Traditional Chinese -> Simplified Chinese charfilter 
+ * Traditional Chinese -> Simplified Chinese charfilter
  * 
- * uses data from {@link https://github.com/BuddhistDigitalResourceCenter/lucene-zh-data}
+ * uses data from
+ * {@link https://github.com/BuddhistDigitalResourceCenter/lucene-zh-data}
  * 
  * @author Hélios Hildt
  *
  */
 
-public class TC2SCFilter extends MappingCharFilter {
+public class TC2SCFilter extends TokenFilter {
 
-    public TC2SCFilter(Reader in) throws IOException {
-        super(getCnNormalizeCharMap(), in);
+    private HashMap<String, String> map;
+
+    public TC2SCFilter(TokenStream in) throws IOException {
+        super(in);
+        map = getMapping();
     }
 
-    public final static NormalizeCharMap getCnNormalizeCharMap() throws IOException {
+    public final HashMap<String, String> getMapping() throws IOException {
         String fileName = "resources/TC2SC.tsv";
         BufferedReader br;
         InputStream stream = null;
         stream = TC2SCFilter.class.getResourceAsStream(fileName);
-        if (stream == null ) {    // we're not using the jar, these is no resource, assuming we're running the code
-             br = new BufferedReader(new FileReader(fileName));
+        if (stream == null) { // we're not using the jar, these is no resource, assuming we're running the
+                              // code
+            br = new BufferedReader(new FileReader(fileName));
         } else {
             br = new BufferedReader(new InputStreamReader(stream));
         }
 
-        final NormalizeCharMap.Builder builder = new NormalizeCharMap.Builder();
+        final HashMap<String, String> map = new HashMap<String, String>();
         String line = null;
         while ((line = br.readLine()) != null) {
             String[] parts = line.split("\t");
-            builder.add(parts[0], parts[1]);
+            map.put(parts[0], parts[1]);
         }
         br.close();
-        
-        return builder.build();
+        return map;
+    }
+
+    CharTermAttribute charTermAttribute = addAttribute(CharTermAttribute.class);
+
+    @Override
+    public final boolean incrementToken() throws IOException {
+        while (input.incrementToken()) {
+            String sc = map.get(charTermAttribute.toString());
+            if (sc != null) {
+                charTermAttribute.setEmpty().append(sc);
+            }
+            return true;
+        }
+        return false;
     }
 }
