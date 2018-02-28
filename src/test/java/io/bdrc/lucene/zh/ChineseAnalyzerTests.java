@@ -82,7 +82,7 @@ public class ChineseAnalyzerTests  {
     }
     
     @Test
-    public void test1() throws IOException
+    public void testChineseIndexingAndCodepointLength() throws IOException
     {
         String input = "𪘁! this is a test. 如是我聞。japanese: ひらがな 一時佛在羅閱祇耆闍崛山中。與大比丘眾千二百五十人菩薩五千人俱\n" + 
                 "。";
@@ -115,11 +115,11 @@ public class ChineseAnalyzerTests  {
                 "非", "要", "在", "这", "份", "爱", "上", "加", "个", "期", "限", "我", 
                 "希", "望", "是", "一", "万", "年");
         System.out.println("0 " + input);
-        Reader sc = new TC2SCFilter(reader);
         Tokenizer tok = new StandardTokenizer();
-        TokenStream words = tokenize(sc, tok);
+        TokenStream words = tokenize(reader, tok);
         TokenStream cnOnly = new CnOnlyFilter(words);
-        assertTokenStream(cnOnly, expected);
+        TokenStream sc = new TC2SCFilter(cnOnly);
+        assertTokenStream(sc, expected);
     }
     
     @Test
@@ -128,12 +128,29 @@ public class ChineseAnalyzerTests  {
         // https://github.com/axgle/pinyin/blob/master/pinyin_test.go
         String input = "世界 中文 汉字 拼音 简体字 莞 濮 泸 漯 亳 儋";
         Reader reader = new StringReader(input);
-        List<String> expected = Arrays.asList("shìjiè", "zhōngwén", "hànzì", "pīnyīn", 
-                "jiǎntǐzì", "guǎn", "pú", "lú", "luò", "bó", "dān");
+        List<String> expected = Arrays.asList("shì", "jiè", "zhōng", "wén", "hàn", "zì", 
+                "pīn", "yīn", "jiǎn", "tǐ", "zì", "guǎn", "pú", "lú", "luò", "bó", "dān");
         System.out.println("0 " + input);
-        Reader pinyin = new PinyinFilter(reader);
         Tokenizer tok = new StandardTokenizer();
-        TokenStream words = tokenize(pinyin, tok);
-        assertTokenStream(words, expected);
+        TokenStream words = tokenize(reader, tok);
+        TokenStream cnOnly = new CnOnlyFilter(words);
+        TokenStream pinyin = new PinyinFilter(cnOnly);
+        assertTokenStream(pinyin, expected);
+    }
+    
+    @Test
+    public void testTcSc2Pinyin() throws IOException
+    {
+        // https://github.com/axgle/pinyin/blob/master/pinyin_test.go
+        String input = "一一 萬万 年年 經经";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("yī", "yī", "wàn", "wàn", 
+                "nián", "nián", "jīng", "jīng");
+        System.out.println("0 " + input);
+        Tokenizer tok = new StandardTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        TokenStream cnOnly = new CnOnlyFilter(words);
+        TokenStream pinyin = new PinyinFilter(cnOnly);
+        assertTokenStream(pinyin, expected);
     }
 }
