@@ -32,9 +32,9 @@ import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
  * 
  * @author Hélios Hildt
  */
-public class CnOnlyFilter extends TokenFilter {
+public class ZhOnlyFilter extends TokenFilter {
 
-  public CnOnlyFilter(TokenStream in) {
+  public ZhOnlyFilter(TokenStream in) {
     super(in);
   }
   

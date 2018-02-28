@@ -50,7 +50,7 @@ public class TC2SCFilter extends TokenFilter {
     }
 
     public final HashMap<String, String> getMapping() throws IOException {
-        String fileName = "resources/TC2SC.tsv";
+        String fileName = "resources/sc2sc.tsv";
         BufferedReader br;
         InputStream stream = null;
         stream = TC2SCFilter.class.getResourceAsStream(fileName);

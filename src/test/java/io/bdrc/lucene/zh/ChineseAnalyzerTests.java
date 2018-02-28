@@ -93,7 +93,7 @@ public class ChineseAnalyzerTests  {
         System.out.println("0 " + input);
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream cnOnly = new CnOnlyFilter(words);
+        TokenStream cnOnly = new ZhOnlyFilter(words);
         assertCharTokenStream(cnOnly, expected);
     }
     
@@ -117,7 +117,7 @@ public class ChineseAnalyzerTests  {
         System.out.println("0 " + input);
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream cnOnly = new CnOnlyFilter(words);
+        TokenStream cnOnly = new ZhOnlyFilter(words);
         TokenStream sc = new TC2SCFilter(cnOnly);
         assertTokenStream(sc, expected);
     }
@@ -133,7 +133,7 @@ public class ChineseAnalyzerTests  {
         System.out.println("0 " + input);
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream cnOnly = new CnOnlyFilter(words);
+        TokenStream cnOnly = new ZhOnlyFilter(words);
         TokenStream pinyin = new PinyinFilter(cnOnly);
         assertTokenStream(pinyin, expected);
     }
@@ -149,7 +149,7 @@ public class ChineseAnalyzerTests  {
         System.out.println("0 " + input);
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream cnOnly = new CnOnlyFilter(words);
+        TokenStream cnOnly = new ZhOnlyFilter(words);
         TokenStream pinyin = new PinyinFilter(cnOnly);
         assertTokenStream(pinyin, expected);
     }
