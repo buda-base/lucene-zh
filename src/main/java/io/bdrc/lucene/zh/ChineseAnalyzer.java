@@ -63,7 +63,7 @@ public final class ChineseAnalyzer extends Analyzer {
         this.encoding = encoding;
         if (stopFilename != null) {
             InputStream stream = null;
-            stream = ChineseAnalyzer.class.getResourceAsStream("/stopwords-zh.txt");
+            stream = ChineseAnalyzer.class.getResourceAsStream("/zh-stopwords.txt");
             if (stream == null ) {    // we're not using the jar, these is no resource, assuming we're running the code
                 this.zhStopWords = StopFilter.makeStopSet(getWordList(new FileInputStream(stopFilename), "#"));
             } else {
