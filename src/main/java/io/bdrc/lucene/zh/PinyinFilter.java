@@ -50,10 +50,10 @@ public class PinyinFilter extends TokenFilter {
     }
 
     public final HashMap<String, String> getMapping() throws IOException {
-        String fileName = "resources/pinyin.tsv";
+        String fileName = "src/main/resources/pinyin.tsv";
         BufferedReader br;
         InputStream stream = null;
-        stream = PinyinFilter.class.getResourceAsStream(fileName);
+        stream = PinyinFilter.class.getResourceAsStream("/pinyin.tsv");
         if (stream == null) { // we're not using the jar, these is no resource, assuming we're running the
                               // code
             br = new BufferedReader(new FileReader(fileName));

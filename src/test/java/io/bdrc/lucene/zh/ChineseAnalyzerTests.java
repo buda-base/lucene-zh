@@ -93,8 +93,8 @@ public class ChineseAnalyzerTests  {
         System.out.println("0 " + input);
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream cnOnly = new ZhOnlyFilter(words);
-        assertCharTokenStream(cnOnly, expected);
+        TokenStream zhOnly = new ZhOnlyFilter(words);
+        assertCharTokenStream(zhOnly, expected);
     }
     
     @Test
@@ -117,8 +117,8 @@ public class ChineseAnalyzerTests  {
         System.out.println("0 " + input);
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream cnOnly = new ZhOnlyFilter(words);
-        TokenStream sc = new TC2SCFilter(cnOnly);
+        TokenStream zhOnly = new ZhOnlyFilter(words);
+        TokenStream sc = new TC2SCFilter(zhOnly);
         assertTokenStream(sc, expected);
     }
     
@@ -133,8 +133,8 @@ public class ChineseAnalyzerTests  {
         System.out.println("0 " + input);
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream cnOnly = new ZhOnlyFilter(words);
-        TokenStream pinyin = new PinyinFilter(cnOnly);
+        TokenStream zhOnly = new ZhOnlyFilter(words);
+        TokenStream pinyin = new PinyinFilter(zhOnly);
         assertTokenStream(pinyin, expected);
     }
     
@@ -149,8 +149,25 @@ public class ChineseAnalyzerTests  {
         System.out.println("0 " + input);
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream cnOnly = new ZhOnlyFilter(words);
-        TokenStream pinyin = new PinyinFilter(cnOnly);
+        TokenStream zhOnly = new ZhOnlyFilter(words);
+        TokenStream pinyin = new PinyinFilter(zhOnly);
         assertTokenStream(pinyin, expected);
+    }
+    
+    @Test
+    public void testStopwordsFilter() throws IOException
+    {
+        // https://github.com/axgle/pinyin/blob/master/pinyin_test.go
+        // Google Translate: Not exactly a Chinese word, meaning not exactly.
+        String input = "不尽然是一个汉语词汇，意思是不完全如此。";
+        Reader reader = new StringReader(input);
+        // Google Translate: Chinese vocabulary meaning completely
+        List<String> expected = Arrays.asList("汉", "语", "词", "汇", "意", "思", "完", "全");
+        System.out.println("0 " + input);
+        Reader noStops = new ZhStopWordsFilter(reader);
+        Tokenizer tok = new StandardTokenizer();
+        TokenStream words = tokenize(noStops, tok);
+        TokenStream zhOnly = new ZhOnlyFilter(words);
+        assertTokenStream(zhOnly, expected);
     }
 }

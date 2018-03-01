@@ -50,10 +50,10 @@ public class TC2SCFilter extends TokenFilter {
     }
 
     public final HashMap<String, String> getMapping() throws IOException {
-        String fileName = "resources/sc2sc.tsv";
+        String fileName = "src/main/resources/tc2sc.tsv";
         BufferedReader br;
         InputStream stream = null;
-        stream = TC2SCFilter.class.getResourceAsStream(fileName);
+        stream = TC2SCFilter.class.getResourceAsStream("/tc2sc.tsv");
         if (stream == null) { // we're not using the jar, these is no resource, assuming we're running the
                               // code
             br = new BufferedReader(new FileReader(fileName));
