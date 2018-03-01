@@ -1,8 +1,6 @@
 # Lucene Analyzers for Buddhist Chinese
 
-## Goal
-
-Indexing Pipeline:
+## Indexing Pipeline:
 
 ```
 TC ⟾ normalized TC ⟾ SC ⟾ normalized SC ⟾ normalized PY_full ⟾ normalized PY_lazy
@@ -13,9 +11,9 @@ TC ⟾ normalized TC ⟾ SC ⟾ normalized SC ⟾ normalized PY_full ⟾ normali
 `normalized PY`: PY is lower-cased and split in syllables (to match the general policy of indexing individual ideograms).
 
 The pipeline may start at any step and may end at any step.
-For example, the proper nouns in BDRC database are already lazy pinyin, so they only need to be normalized.
+For example, words in lazy pinyin only need to be normalized.
 
-Including the diacritics in a PY index allows to reduce the homophons, thus reducing the noise in the results.
+Including the diacritics in a PY index allows to reduce the homophones, thus reducing the noise in the results.
 
 ### Constructors
 
