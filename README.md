@@ -3,10 +3,14 @@
 ## Goal
 
 Indexing Pipeline:
-TC >> TC_enhanced >> SC >> SC_enhanced >> normalized PY_full >> normalized PY_lazy
 
-enhanced: any combination of the following treatments: synonyms, alternatives and stopwords.
-normalized: PY is lower-cased and split in syllables (to match the general policy of indexing individual ideograms).
+```
+TC >> TC_enhanced >> SC >> SC_enhanced >> normalized PY_full >> normalized PY_lazy
+```
+
+`enhanced`: any combination of the following treatments: synonyms, alternatives and stopwords.
+
+`normalized`: PY is lower-cased and split in syllables (to match the general policy of indexing individual ideograms).
 
 The pipeline may start at any step and may end at any step.
 For example, the proper nouns in BDRC database are already lazy pinyin, so they only need to be normalized.
