@@ -15,6 +15,11 @@ For example, words in lazy pinyin only need to be normalized.
 
 Including the diacritics in a PY index allows to reduce the homophones, thus reducing the noise in the results.
 
+In the Unihan database, 88884 codepoints have an entry(both full ideograms and parts of surrogate pairs).
+82829 entries have no information about being TC nor SC, 3037 are specifically TC, 3007 are specifically SC and 11 have information about both TC and SC.
+
+There are 1655 possible syllables in full PY, 469 in lazy PY (syllable size spans from 1 to 6 chars).
+
 ## Constructors
 
 ```
