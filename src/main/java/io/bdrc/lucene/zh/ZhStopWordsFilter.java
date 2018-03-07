@@ -45,7 +45,7 @@ public class ZhStopWordsFilter extends MappingCharFilter {
     }
 
     public final static NormalizeCharMap getCnNormalizeCharMap() throws IOException {
-        String fileName = "src/main/resources/stopwords-zh.txt";
+        String fileName = "src/main/resources/zh-stopwords.txt";
         BufferedReader br;
         InputStream stream = null;
         stream = ZhStopWordsFilter.class.getResourceAsStream("/stopwords-zh.txt");

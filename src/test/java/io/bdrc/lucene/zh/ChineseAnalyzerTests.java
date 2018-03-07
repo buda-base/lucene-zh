@@ -155,9 +155,22 @@ public class ChineseAnalyzerTests  {
     }
     
     @Test
+    public void testPY2PY_lazyFilter() throws IOException
+    {
+        String input = "yī wàn nián jīng āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("yi", "wan", "nian", "jing", 
+                "aaaaeeeeiiiioooouuuuuuuu");
+        System.out.println("0 " + input);
+        Tokenizer tok = new StandardTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        TokenStream pinyin = new LazyPinyinFilter(words);
+        assertTokenStream(pinyin, expected);
+    }
+    
+    @Test
     public void testStopwordsFilter() throws IOException
     {
-        // https://github.com/axgle/pinyin/blob/master/pinyin_test.go
         // Google Translate: Not exactly a Chinese word, meaning not exactly.
         String input = "不尽然是一个汉语词汇，意思是不完全如此。";
         Reader reader = new StringReader(input);
