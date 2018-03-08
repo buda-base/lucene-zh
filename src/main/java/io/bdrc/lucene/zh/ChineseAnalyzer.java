@@ -20,22 +20,14 @@
 package io.bdrc.lucene.zh;
 
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-
+import java.security.InvalidParameterException;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
-import org.apache.lucene.util.IOUtils;
 
 /**
  * A Chinese Analyzer that uses {@link StandardTokenizer}
@@ -47,69 +39,159 @@ import org.apache.lucene.util.IOUtils;
  **/
 public final class ChineseAnalyzer extends Analyzer {
   
-    private int encoding;
-    CharArraySet zhStopWords;
-
+    private boolean stopwords = false;
+    private String indexEncoding = null;
+    private String inputEncoding = null;
+    private int variants = -1;
+    
     /**
-     * Creates a new {@link ChineseAnalyzer} with the default values
-     * @throws IOException  stopwords
-     * @throws FileNotFoundException 
+     * Chinese Analyzer constructor with default values per profile
+     * @param profile 
+     *              either one of [exactTC, TC, TC2SC, TC2PYstrict, TC2PYlazy, 
+     *                             SC, SC2PYstrict, SC2PYlazy,
+     *                             PYstrict, PYstrict2PYlazy,
+     *                             PYlazy]
      */
-    public ChineseAnalyzer() throws FileNotFoundException, IOException {
-        this(0, "resources/stopwords-zy.txt");
-    }
-  
-    public ChineseAnalyzer(int encoding, String stopFilename) throws FileNotFoundException, IOException {
-        this.encoding = encoding;
-        if (stopFilename != null) {
-            InputStream stream = null;
-            stream = ChineseAnalyzer.class.getResourceAsStream("/zh-stopwords.txt");
-            if (stream == null ) {    // we're not using the jar, these is no resource, assuming we're running the code
-                this.zhStopWords = StopFilter.makeStopSet(getWordList(new FileInputStream(stopFilename), "#"));
-            } else {
-                this.zhStopWords = StopFilter.makeStopSet(getWordList(stream, "#"));
-            }
+    public ChineseAnalyzer(String profile) {
+        if (profile.equals("exactTC")) {
+            this.inputEncoding = "TC";
+            this.indexEncoding = "TC";
+        
+        } else if (profile.equals("TC")) {
+            this.inputEncoding = "TC";
+            this.indexEncoding = "TC";
+        
+        } else if (profile.equals("TC2SC")) {
+            this.inputEncoding = "TC";
+            this.indexEncoding = "SC";
+        
+        } else if (profile.equals("TC2PYstrict")) {
+            this.inputEncoding = "TC";
+            this.indexEncoding = "PYstrict";
+        
+        } else if (profile.equals("TC2PYlazy")) {
+            this.inputEncoding = "TC";
+            this.indexEncoding = "PYlazy";
+        
+        } else if (profile.equals("SC")) {
+            this.inputEncoding = "SC";
+            this.indexEncoding = "SC";
+        
+        } else if (profile.equals("SC2PYstrict")) {
+            this.inputEncoding = "SC";
+            this.indexEncoding = "PYstrict";
+        
+        } else if (profile.equals("SC2PYlazy")) {
+            this.inputEncoding = "SC";
+            this.indexEncoding = "PYlazy";
+        
+        } else if (profile.equals("PYstrict")) {
+            this.inputEncoding = "PYstrict";
+            this.indexEncoding = "PYstrict";
+        
+        } else if (profile.equals("PYstrict2PYlazy")) {
+            this.inputEncoding = "PYstrict";
+            this.indexEncoding = "PYlazy";
+        
+        } else if (profile.equals("PYlazy")) {
+            this.inputEncoding = "PYlazy";
+            this.indexEncoding = "PYlazy";
+            
         } else {
-            this.zhStopWords = null;
+            throw new InvalidParameterException(profile+" is not a supported profile");
+        }
+        
+        if (this.inputEncoding.startsWith("exact")) {
+            this.variants = 0;
+            this.stopwords = false;
+        
+        } else if (this.inputEncoding.startsWith("PY")) {
+            this.variants = 1;  // because alternatives are stylistic variants of ideograms
+            this.stopwords = true;
+        
+        } else {
+            this.variants = 3;
+            this.stopwords = true;
         }
     }
-  
+    
     /**
-     * @param reader Reader containing the list of stopwords
-     * @param comment The string representing a comment.
-     * @return result the {@link ArrayList} to fill with the reader's words
+     * 
+     * @param profile
+     *              all profiles except for exactTC
+     * @param stopwords
+     *              true to filter stopwords, false otherwise
+     * @param variants
+     *              0: no variant, 1: synonyms, 2: alternatives, 3: both
      */
-    public static ArrayList<String> getWordList(InputStream inputStream, String comment) throws IOException {
-        ArrayList<String> result = new ArrayList<String>();
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(inputStream));
-            String word = null;
-            while ((word = br.readLine()) != null) {
-                word = word.replace("\t", "");
-                if (word.contains(comment)) {
-                    if (!word.startsWith(comment)) {
-                        word = word.substring(0, word.indexOf(comment));
-                        word = word.trim();
-                        if (!word.isEmpty()) result.add(word);
-                    }
-                } else {
-                    word = word.trim();
-                    if (!word.isEmpty()) result.add(word);
-                }
-            }
+    public ChineseAnalyzer(String profile, boolean stopwords, int variants) {
+        if (profile.equals("TC")) {
+            this.inputEncoding = "TC";
+            this.indexEncoding = "TC";
+            this.variants = variants;
+            this.stopwords = stopwords;
+        
+        } else if (profile.equals("TC2SC")) {
+            this.inputEncoding = "TC";
+            this.indexEncoding = "SC";
+            this.variants = variants;
+            this.stopwords = stopwords;
+        
+        } else if (profile.equals("TC2PYstrict")) {
+            this.inputEncoding = "TC";
+            this.indexEncoding = "PYstrict";
+            this.variants = variants;
+            this.stopwords = stopwords;
+        
+        } else if (profile.equals("TC2PYlazy")) {
+            this.inputEncoding = "TC";
+            this.indexEncoding = "PYlazy";
+            this.variants = variants;
+            this.stopwords = stopwords;
+        
+        } else if (profile.equals("SC")) {
+            this.inputEncoding = "SC";
+            this.indexEncoding = "SC";
+            this.variants = variants;
+            this.stopwords = stopwords;
+        
+        } else if (profile.equals("SC2PYstrict")) {
+            this.inputEncoding = "SC";
+            this.indexEncoding = "PYstrict";
+            this.variants = variants;
+            this.stopwords = stopwords;
+        
+        } else if (profile.equals("SC2PYlazy")) {
+            this.inputEncoding = "SC";
+            this.indexEncoding = "PYlazy";
+            this.variants = variants;
+            this.stopwords = stopwords;
+        
+        } else if (profile.equals("PYstrict")) {
+            this.inputEncoding = "PYstrict";
+            this.indexEncoding = "PYstrict";
+            this.stopwords = true;
+        
+        } else if (profile.equals("PYstrict2PYlazy")) {
+            this.inputEncoding = "PYstrict";
+            this.indexEncoding = "PYlazy";
+            this.stopwords = true;
+        
+        } else if (profile.equals("PYlazy")) {
+            this.inputEncoding = "PYlazy";
+            this.indexEncoding = "PYlazy";
+            this.stopwords = true;
+        
+        } else {
+            throw new InvalidParameterException(profile+" is not a supported profile");
         }
-        finally {
-            IOUtils.close(br);
-        }
-        return result;
     }
     
     @Override
     protected Reader initReader(String fieldName, Reader reader) {
         
-        /* if (we want to index in SC or in pinyin) */
-        if (this.encoding == 1 || this.encoding == 2) {
+        /* if (the input is not PY and we want to filter stopwords) */
+        if (!this.inputEncoding.startsWith("PY") && this.stopwords) {
             try {
                 reader = new ZhStopWordsFilter(reader);
             } catch (IOException e) {
@@ -124,26 +206,56 @@ public final class ChineseAnalyzer extends Analyzer {
     
     @Override
     protected TokenStreamComponents createComponents(final String fieldName) {        
+        /* tokenizes in ideograms or in words separated by punctuation.*/
         TokenStream tokenStream = new StandardTokenizer();
-        tokenStream = new ZhOnlyFilter(tokenStream);
         
-        /* if (we want to index in SC) */
-        if (this.encoding == 1) {
-            try {
-                tokenStream = new TC2SCFilter(tokenStream);
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (this.inputEncoding.equals("TC")) {
+            /* only keep TC tokens */
+            tokenStream = new ZhOnlyFilter(tokenStream);
+            
+            if (this.indexEncoding.equals("TC")) { 
+                if (variants == 0) {
+                    
+                } else if (variants == 1) {
+                    
+                } else if (variants == 2) {
+                    
+                } else if (variants == 3) {
+                    
+                }
+            } else if (this.indexEncoding.equals("SC")) {
+                
+            } else if (this.indexEncoding.equals("PYstrict")) {
+                
+            } else if (this.indexEncoding.equals("PYlazy")) {
+                
             }
-        
-        /* if (we want to index in pinyin) */
-        } else if (this.encoding == 2) {
-            try {
-                tokenStream = new PinyinFilter(tokenStream);
-            } catch (IOException e) {
-                e.printStackTrace();
+            
+            if (!this.indexEncoding.equals("exact")) {
+                if (true) {
+                    
+                }
             }
         }
 
+        if (this.inputEncoding.equals("SC")) {
+            /* only keep TC tokens */
+            tokenStream = new ZhOnlyFilter(tokenStream);
+        }
+
+        if (this.indexEncoding.startsWith("PY")) {
+            /* Syllabify Pinyin */
+            // syllabify method
+            
+            if (this.inputEncoding.equals("PYstrict")) {
+                tokenStream = new LowerCaseFilter(tokenStream);
+            }
+
+            if (this.inputEncoding.equals("PYlazy")) {
+                tokenStream = new LowerCaseFilter(tokenStream);
+            }
+        }
+        
         return new TokenStreamComponents((Tokenizer) tokenStream);
     }
 }
