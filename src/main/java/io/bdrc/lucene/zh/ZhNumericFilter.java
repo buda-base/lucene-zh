@@ -30,7 +30,9 @@ import org.apache.lucene.analysis.charfilter.MappingCharFilter;
 import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
 
 /**
- * Traditional Chinese -> Simplified Chinese charfilter 
+ * Maps all numeric ideograms to the corresponding numbers.
+ * 
+ * For ex: "一", "壱", "壹" and "弌"  all map to "1"
  * 
  * uses data from {@link https://github.com/BuddhistDigitalResourceCenter/lucene-zh-data}
  * 
@@ -38,17 +40,17 @@ import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
  *
  */
 
-public class ZhStopWordsFilter extends MappingCharFilter {
+public class ZhNumericFilter extends MappingCharFilter {
 
-    public ZhStopWordsFilter(Reader in) throws IOException {
+    public ZhNumericFilter(Reader in) throws IOException {
         super(getCnNormalizeCharMap(), in);
     }
 
     public final static NormalizeCharMap getCnNormalizeCharMap() throws IOException {
-        String fileName = "src/main/resources/zh-stopwords.txt";
+        String fileName = "src/main/resources/zh-numbers.txt";
         BufferedReader br;
         InputStream stream = null;
-        stream = ZhStopWordsFilter.class.getResourceAsStream("/zh-stopwords.txt");
+        stream = ZhNumericFilter.class.getResourceAsStream("/zh-numbers.txt");
         if (stream == null ) {    // we're not using the jar, these is no resource, assuming we're running the code
              br = new BufferedReader(new FileReader(fileName));
         } else {

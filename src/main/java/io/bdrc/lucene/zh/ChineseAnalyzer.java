@@ -207,55 +207,74 @@ public final class ChineseAnalyzer extends Analyzer {
     @Override
     protected TokenStreamComponents createComponents(final String fieldName) {        
         /* tokenizes in ideograms or in words separated by punctuation.*/
-        TokenStream tokenStream = new StandardTokenizer();
+        Tokenizer tok = new StandardTokenizer();
+        TokenStream tokenStream = null;
         
-        if (this.inputEncoding.equals("TC")) {
+        /* if (input is either TC or SC) */
+        if (this.inputEncoding.endsWith("C")) {
             /* only keep TC tokens */
-            tokenStream = new ZhOnlyFilter(tokenStream);
+            tokenStream = new ZhOnlyFilter(tok);
             
-            if (this.indexEncoding.equals("TC")) { 
-                if (variants == 0) {
-                    
-                } else if (variants == 1) {
-                    
-                } else if (variants == 2) {
-                    
-                } else if (variants == 3) {
-                    
+            /* apply variant filters */
+            if (variants == 0) {
+                // pass
+            } else if (variants == 1) {
+                try {
+                    tokenStream = new ZhSynonymFilter(tokenStream);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } else if (this.indexEncoding.equals("SC")) {
-                
-            } else if (this.indexEncoding.equals("PYstrict")) {
-                
-            } else if (this.indexEncoding.equals("PYlazy")) {
-                
-            }
             
-            if (!this.indexEncoding.equals("exact")) {
-                if (true) {
-                    
+            } else if (variants == 2) {
+                try {
+                    tokenStream = new ZhAlternatesFilter(tokenStream);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            
+            } else if (variants == 3) {
+                try {
+                    tokenStream = new ZhSynonymFilter(tokenStream);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    tokenStream = new ZhAlternatesFilter(tokenStream);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
-        }
-
-        if (this.inputEncoding.equals("SC")) {
-            /* only keep TC tokens */
-            tokenStream = new ZhOnlyFilter(tokenStream);
-        }
-
-        if (this.indexEncoding.startsWith("PY")) {
+        } else if (this.inputEncoding.startsWith("PY")) {
+            tokenStream = new LowerCaseFilter(tok);
+            // pinyin stopwords TokenFilter
+            
             /* Syllabify Pinyin */
             // syllabify method
             
-            if (this.inputEncoding.equals("PYstrict")) {
-                tokenStream = new LowerCaseFilter(tokenStream);
-            }
+        }
 
-            if (this.inputEncoding.equals("PYlazy")) {
-                tokenStream = new LowerCaseFilter(tokenStream);
+        /* indexing from TC to SC */
+        if (this.indexEncoding.equals("SC") && this.inputEncoding.equals("TC")) {
+            try {
+                tokenStream = new TC2SCFilter(tokenStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        
+        /* indexing from ideograms to pinyin */
+        } else if (this.indexEncoding.startsWith("PY") && this.inputEncoding.endsWith("C")) {
+            try {
+                tokenStream = new PinyinFilter(tokenStream);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         
-        return new TokenStreamComponents((Tokenizer) tokenStream);
+        /* indexing from any encoding to PYlazy */
+        if (this.indexEncoding.equals("PYlazy") && !this.inputEncoding.equals("PYlazy")) {
+            tokenStream = new LazyPinyinFilter(tokenStream);
+        }
+        
+        return new TokenStreamComponents(tok, tokenStream);
     }
 }
