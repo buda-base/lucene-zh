@@ -54,7 +54,7 @@ public final class ChineseAnalyzer extends Analyzer {
      */
     public ChineseAnalyzer(String profile) {
         if (profile.equals("exactTC")) {
-            this.inputEncoding = "TC";
+            this.inputEncoding = "exact";
             this.indexEncoding = "TC";
         
         } else if (profile.equals("TC")) {
@@ -101,9 +101,10 @@ public final class ChineseAnalyzer extends Analyzer {
             throw new InvalidParameterException(profile+" is not a supported profile");
         }
         
-        if (this.inputEncoding.startsWith("exact")) {
+        if (this.inputEncoding.equals("exact")) {
             this.variants = 0;
             this.stopwords = false;
+            this.inputEncoding = "TC";
         
         } else if (this.inputEncoding.startsWith("PY")) {
             this.variants = 1;  // because alternatives are stylistic variants of ideograms
@@ -191,17 +192,14 @@ public final class ChineseAnalyzer extends Analyzer {
     protected Reader initReader(String fieldName, Reader reader) {
         
         /* if (the input is not PY and we want to filter stopwords) */
-        if (!this.inputEncoding.startsWith("PY") && this.stopwords) {
+        if (!this.inputEncoding.startsWith("PY") && this.stopwords)
             try {
                 reader = new ZhStopWordsFilter(reader);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return super.initReader(fieldName, reader);
         
-        } else {
-            return super.initReader(fieldName, reader);
-        }
+        return super.initReader(fieldName, reader);
     }
     
     @Override

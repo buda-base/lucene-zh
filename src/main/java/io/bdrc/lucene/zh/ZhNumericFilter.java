@@ -30,10 +30,20 @@ import org.apache.lucene.analysis.charfilter.MappingCharFilter;
 import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
 
 /**
+ * !!! IMPORTANT
+ * As the data from zh-numbers.tsv is not comprehensive enough to correctly parse all numerals 
+ * to their arabic counterparts, this Filter is not used in ChineseAnalyzer 
+ * (See {@link http://www.mandarintools.com/numbers.html})
+ * 
+ * {@link https://en.wikibooks.org/wiki/Chinese_(Mandarin)/Numbers} also shows that these numeral
+ * ideograms have different meanings, like: '貳(2) can also mean "to betray"'. 
+ * !!!
+ * 
  * Maps all numeric ideograms to the corresponding numbers.
  * 
  * For ex: "一", "壱", "壹" and "弌"  all map to "1"
  * 
+ * Note: ZhOnlyFilter deletes the arabic numbers coming out of ZhNumericFilter.
  * uses data from {@link https://github.com/BuddhistDigitalResourceCenter/lucene-zh-data}
  * 
  * @author Hélios Hildt
@@ -47,10 +57,10 @@ public class ZhNumericFilter extends MappingCharFilter {
     }
 
     public final static NormalizeCharMap getCnNormalizeCharMap() throws IOException {
-        String fileName = "src/main/resources/zh-numbers.txt";
+        String fileName = "src/main/resources/zh-numbers.tsv";
         BufferedReader br;
         InputStream stream = null;
-        stream = ZhNumericFilter.class.getResourceAsStream("/zh-numbers.txt");
+        stream = ZhNumericFilter.class.getResourceAsStream("/zh-numbers.tsv");
         if (stream == null ) {    // we're not using the jar, these is no resource, assuming we're running the code
              br = new BufferedReader(new FileReader(fileName));
         } else {
@@ -60,7 +70,8 @@ public class ZhNumericFilter extends MappingCharFilter {
         final NormalizeCharMap.Builder builder = new NormalizeCharMap.Builder();
         String line = null;
         while ((line = br.readLine()) != null) {
-            builder.add(line, "");  // we want to map all stopword sequences to nothing to delete them
+            String[] parts= line.split("\t");
+            builder.add(parts[0], parts[1]);
         }
         br.close();
 

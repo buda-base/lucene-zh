@@ -183,4 +183,17 @@ public class ChineseComponentsTests  {
         TokenStream zhOnly = new ZhOnlyFilter(words);
         assertTokenStream(zhOnly, expected);
     }
+    
+    @Test
+    public void testNumericFilter() throws IOException
+    {
+        String input = "兆";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("1000000000000");
+        System.out.println("0 " + input);
+        Reader noStops = new ZhNumericFilter(reader);
+        Tokenizer tok = new StandardTokenizer();
+        TokenStream words = tokenize(noStops, tok);
+        assertTokenStream(words, expected);
+    }
 }
