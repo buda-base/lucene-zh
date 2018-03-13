@@ -66,6 +66,23 @@ public class ChineseAnalyzerTests {
         System.out.println();
         assertEquals(expected, tokens);
     }
+
+    @Test
+    public void testTCbis() throws IOException
+    {
+        String input = "如是我聞。一時佛在羅閱祇耆闍崛山中。與大比丘眾千二百五十人菩薩五千人俱";
+// With and without stopwords (no variants).
+//      聞   時佛  羅閱祇耆闍崛山   與   丘眾千  百 十  菩薩  千 俱
+// 如是我聞。一時佛在羅閱祇耆闍崛山中。與大比丘眾千二百五十人菩薩五千人俱
+        List<String> expected = Arrays.asList("聞", "時", "佛", "羅", "閱", "祇", "耆", "闍", 
+                "崛", "山", "與", "丘", "眾", "千", "百", "十", "菩", "薩", "千", "俱");
+        Analyzer ca = new ChineseAnalyzer("TC", true, 0);
+        List<String> tokens = parseTokens(ca, input);
+        System.out.println("1 " + expected.toString());
+        System.out.println("2 " + tokens.toString());
+        System.out.println();
+        assertEquals(expected, tokens);
+    }
     
     @Test
     public void testTC2PYstrict() throws IOException
