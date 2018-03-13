@@ -196,4 +196,19 @@ public class ChineseComponentsTests  {
         TokenStream words = tokenize(noStops, tok);
         assertTokenStream(words, expected);
     }
+    
+    @Test
+    public void bugSimplifiedChinese() throws IOException
+    {
+        // input and output from https://github.com/BYVoid/OpenCC/tree/master/test/testcases
+        String input = "閱";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("阅");
+        System.out.println("0 " + input);
+        Tokenizer tok = new StandardTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        TokenStream zhOnly = new ZhOnlyFilter(words);
+        TokenStream sc = new TC2SCFilter(zhOnly);
+        assertTokenStream(sc, expected);
+    }
 }
