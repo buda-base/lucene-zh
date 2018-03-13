@@ -107,8 +107,8 @@ public final class ChineseAnalyzer extends Analyzer {
             this.inputEncoding = "TC";
         
         } else if (this.inputEncoding.startsWith("PY")) {
-            this.variants = 1;  // because alternatives are stylistic variants of ideograms
-            this.stopwords = true;
+            this.variants = 0;
+            this.stopwords = false;
         
         } else {
             this.variants = 3;
@@ -242,13 +242,13 @@ public final class ChineseAnalyzer extends Analyzer {
                     e.printStackTrace();
                 }
             }
+        
         } else if (this.inputEncoding.startsWith("PY")) {
             tokenStream = new LowerCaseFilter(tok);
             // pinyin stopwords TokenFilter
             
             /* Syllabify Pinyin */
             // syllabify method
-            
         }
 
         /* indexing from TC to SC */

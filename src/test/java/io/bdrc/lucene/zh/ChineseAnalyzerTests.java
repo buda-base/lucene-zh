@@ -53,7 +53,6 @@ public class ChineseAnalyzerTests {
     @Test
     public void testTC() throws IOException
     {
-        // https://github.com/axgle/pinyin/blob/master/pinyin_test.go
         String input = "世界 中文 汉字 拼音 简体字 莞 濮 泸 漯 亳 儋 兆 嚳";   
         // 中(char3) is a stopword, it is deleted. 
         // 堺(char2) is the alternative (zVariant) found for 界.
@@ -71,7 +70,6 @@ public class ChineseAnalyzerTests {
     @Test
     public void testTC2PYstrict() throws IOException
     {
-        // https://github.com/axgle/pinyin/blob/master/pinyin_test.go
         String input = "世界 中文 汉字 拼音 简体字 莞 濮 泸 漯 亳 儋";
         List<String> expected = Arrays.asList("shì", "jiè", "wén", "hàn", "zì", 
                 "pīn", "yīn", "jiǎn", "tǐ", "zì", "guǎn", "pú", "lú", "luò", "bó", "dān");
@@ -86,7 +84,6 @@ public class ChineseAnalyzerTests {
     @Test
     public void testTC2PYlazy() throws IOException
     {
-        // https://github.com/axgle/pinyin/blob/master/pinyin_test.go
         String input = "世界 中文 汉字 拼音 简体字 莞 濮 泸 漯 亳 儋";
         List<String> expected = Arrays.asList("shi", "jie", "wen", "han", "zi", 
                 "pin", "yin", "jian", "ti", "zi", "guan", "pu", "lu", "luo", "bo", "dan");

@@ -85,6 +85,8 @@ OpenCC adds 1015 TC to SC pairs.
 
 `src/main/resources/zh-stopwords.txt` is [this stop-list](https://github.com/stopwords-iso/stopwords-zh/blob/master/stopwords-zh.txt) 
 
+`src/main/resources/zh-stopwords_analyzed.txt` is the same list as above with the corresponding SC, PYstrict and PYlazy corresponding strings. It was generated using `PrettyPrintResult.java`.
+
 ## Licence
 The code is Copyright 2018 Buddhist Digital Resource Center, and is provided under [Apache License 2.0](LICENSE).
 
