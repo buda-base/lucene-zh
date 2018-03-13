@@ -201,9 +201,9 @@ public class ChineseComponentsTests  {
     public void bugSimplifiedChinese() throws IOException
     {
         // input and output from https://github.com/BYVoid/OpenCC/tree/master/test/testcases
-        String input = "閱";
+        String input = "祇";
         Reader reader = new StringReader(input);
-        List<String> expected = Arrays.asList("阅");
+        List<String> expected = Arrays.asList("只");
         System.out.println("0 " + input);
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);

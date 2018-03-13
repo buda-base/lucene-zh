@@ -66,7 +66,7 @@ public class PrettyPrintResult {
                 if (parsed.isEmpty()) {
                     processedLine += "\t";
                 }
-                String joined = String.join("", parsed);
+                String joined = String.join("-", parsed);
                 processedLine += joined + "\t";
             }
             writer.write(processedLine + "\n");

@@ -70,9 +70,10 @@ public class ChineseAnalyzerTests {
     @Test
     public void testTC2PYstrict() throws IOException
     {
-        String input = "世界 中文 汉字 拼音 简体字 莞 濮 泸 漯 亳 儋";
-        List<String> expected = Arrays.asList("shì", "jiè", "wén", "hàn", "zì", 
-                "pīn", "yīn", "jiǎn", "tǐ", "zì", "guǎn", "pú", "lú", "luò", "bó", "dān");
+        String input = "如是我聞。一時佛在羅閱祇耆闍崛山中。與大比丘眾千二百五十人菩薩五千人俱";
+        List<String> expected = Arrays.asList("wén", "shí", "fó", "luō", "yuè", "qí", "qí", 
+                "dū", "jué", "shān", "yǔ", "qiū", "zhòng", "qiān", "bǎi", "shí", "pú", "sà", 
+                "qiān", "jù");
         Analyzer ca = new ChineseAnalyzer("TC2PYstrict");
         List<String> tokens = parseTokens(ca, input);
         System.out.println("1 " + expected.toString());
@@ -84,10 +85,81 @@ public class ChineseAnalyzerTests {
     @Test
     public void testTC2PYlazy() throws IOException
     {
-        String input = "世界 中文 汉字 拼音 简体字 莞 濮 泸 漯 亳 儋";
-        List<String> expected = Arrays.asList("shi", "jie", "wen", "han", "zi", 
-                "pin", "yin", "jian", "ti", "zi", "guan", "pu", "lu", "luo", "bo", "dan");
+// The second line shows the output with no variant applied, keeping all stopwords conf: ChineseAnalyzer("TC2PYlazy", false, 0) 
+//              wen,     shi, fo,      luo, yue, qi, qi, du, jue, shan,        yu,         qiu, zhong, qian,     bai,     shi,      pu, sa,     qian,      ju
+// ru, shi, wo, wen, yi, shi, fu, zai, luo, yue, qi, qi, du, jue, shan, zhong, yu, da, bi, qiu, zhong, qian, er, bai, wu, shi, ren, pu, sa, wu, qian, ren, ju
+        String input = "如是我聞。一時佛在羅閱祇耆闍崛山中。與大比丘眾千二百五十人菩薩五千人俱";
+        List<String> expected = Arrays.asList("wen", "shi", "fo", "luo", "yue", "qi", "qi", 
+                "du", "jue", "shan", "yu", "qiu", "zhong", "qian", "bai", "shi", "pu", "sa", 
+                "qian", "ju");
         Analyzer ca = new ChineseAnalyzer("TC2PYlazy");
+        List<String> tokens = parseTokens(ca, input);
+        System.out.println("1 " + expected.toString());
+        System.out.println("2 " + tokens.toString());
+        System.out.println();
+        assertEquals(expected, tokens);
+    }
+    
+    @Test
+    public void testTC2PYlazyNoStopsNoVariants() throws IOException
+    {
+        String input = "如是我聞。一時佛在羅閱祇耆闍崛山中。與大比丘眾千二百五十人菩薩五千人俱";
+        List<String> expected = Arrays.asList("ru", "shi", "wo", "wen", "yi", "shi", "fu", 
+                "zai", "luo", "yue", "qi", "qi", "du", "jue", "shan", "zhong", "yu", "da", 
+                "bi", "qiu", "zhong", "qian", "er", "bai", "wu", "shi", "ren", "pu", "sa", 
+                "wu", "qian", "ren", "ju");
+        Analyzer ca = new ChineseAnalyzer("TC2PYlazy", false, 0);
+        List<String> tokens = parseTokens(ca, input);
+        System.out.println("1 " + expected.toString());
+        System.out.println("2 " + tokens.toString());
+        System.out.println();
+        assertEquals(expected, tokens);
+    }
+    
+    @Test
+    public void testPYstrict2PYlazy() throws IOException
+    {
+        String input = "Rú shì wǒ wén. Yī shí fú zài luó yuè qí qí dū jué shān zhōng. "
+                + "Yǔ dà bǐ qiū zhòng qiān èr bǎi wǔ shí rén pú sà wǔ qiān rén jù.";
+        List<String> expected = Arrays.asList("ru", "shi", "wo", "wen", "yi", "shi", "fu", 
+                "zai", "luo", "yue", "qi", "qi", "du", "jue", "shan", "zhong", "yu", "da", 
+                "bi", "qiu", "zhong", "qian", "er", "bai", "wu", "shi", "ren", "pu", "sa", 
+                "wu", "qian", "ren", "ju");
+        Analyzer ca = new ChineseAnalyzer("PYstrict2PYlazy");
+        List<String> tokens = parseTokens(ca, input);
+        System.out.println("1 " + expected.toString());
+        System.out.println("2 " + tokens.toString());
+        System.out.println();
+        assertEquals(expected, tokens);
+    }
+    
+    @Test
+    public void testPYstrict() throws IOException
+    {
+        String input = "Rú sHì Wǒ wéN. Yī shí fú zài luó yuè qí qí dū jué shān zhōng. "
+                + "Yǔ dà bǐ qiū zhòng qiān èr bǎi wǔ shí rén pú sà wǔ qiān rén jù.";
+        List<String> expected = Arrays.asList("rú", "shì", "wǒ", "wén", "yī", "shí", "fú", 
+                "zài", "luó", "yuè", "qí", "qí", "dū", "jué", "shān", "zhōng", "yǔ", "dà", 
+                "bǐ", "qiū", "zhòng", "qiān", "èr", "bǎi", "wǔ", "shí", "rén", "pú", "sà", 
+                "wǔ", "qiān", "rén", "jù");
+        Analyzer ca = new ChineseAnalyzer("PYstrict");
+        List<String> tokens = parseTokens(ca, input);
+        System.out.println("1 " + expected.toString());
+        System.out.println("2 " + tokens.toString());
+        System.out.println();
+        assertEquals(expected, tokens);
+    }
+    
+    @Test
+    public void testPYlazy() throws IOException
+    {
+        String input = "Ru sHi Wo weN. Yi shi fu zai luo yue qi qi du jue shan zhong. "
+                + "Yu da bi qiu zhong qian er bai wu shi ren pu sa wu qian ren ju.";
+        List<String> expected = Arrays.asList("ru", "shi", "wo", "wen", "yi", "shi", "fu", 
+                "zai", "luo", "yue", "qi", "qi", "du", "jue", "shan", "zhong", "yu", "da", 
+                "bi", "qiu", "zhong", "qian", "er", "bai", "wu", "shi", "ren", "pu", "sa", 
+                "wu", "qian", "ren", "ju");
+        Analyzer ca = new ChineseAnalyzer("PYstrict");
         List<String> tokens = parseTokens(ca, input);
         System.out.println("1 " + expected.toString());
         System.out.println("2 " + tokens.toString());
