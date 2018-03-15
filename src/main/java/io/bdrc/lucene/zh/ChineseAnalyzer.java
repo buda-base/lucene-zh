@@ -23,10 +23,14 @@ package io.bdrc.lucene.zh;
 import java.io.IOException;
 import java.io.Reader;
 import java.security.InvalidParameterException;
+import java.util.regex.Pattern;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
+import org.apache.lucene.analysis.pattern.PatternReplaceCharFilter;
+import org.apache.lucene.analysis.pattern.PatternTokenizer;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 
 /**
@@ -42,7 +46,7 @@ public final class ChineseAnalyzer extends Analyzer {
     private boolean stopwords = false;
     private String indexEncoding = null;
     private String inputEncoding = null;
-    private int variants = -1;
+    private int variants = -1;    
     
     /**
      * Chinese Analyzer constructor with default values per profile
@@ -192,12 +196,13 @@ public final class ChineseAnalyzer extends Analyzer {
     protected Reader initReader(String fieldName, Reader reader) {
         
         /* if (the input is not PY and we want to filter stopwords) */
-        if (!this.inputEncoding.startsWith("PY") && this.stopwords)
+        if (!this.inputEncoding.startsWith("PY") && this.stopwords) {
             try {
                 reader = new ZhStopWordsFilter(reader);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
         
         return super.initReader(fieldName, reader);
     }
@@ -205,7 +210,13 @@ public final class ChineseAnalyzer extends Analyzer {
     @Override
     protected TokenStreamComponents createComponents(final String fieldName) {        
         /* tokenizes in ideograms or in words separated by punctuation.*/
-        Tokenizer tok = new StandardTokenizer();
+        Tokenizer tok;
+        if (this.inputEncoding.startsWith("PY")) {
+            tok = new PinyinTokenizer();
+        } else {
+            tok = new StandardTokenizer();
+        }
+        
         TokenStream tokenStream = null;
         
         /* if (input is either TC or SC) */
@@ -245,10 +256,8 @@ public final class ChineseAnalyzer extends Analyzer {
         
         } else if (this.inputEncoding.startsWith("PY")) {
             tokenStream = new LowerCaseFilter(tok);
-            // pinyin stopwords TokenFilter
             
             /* Syllabify Pinyin */
-            // syllabify method
         }
 
         /* indexing from TC to SC */

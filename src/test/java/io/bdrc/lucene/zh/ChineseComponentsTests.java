@@ -168,6 +168,19 @@ public class ChineseComponentsTests  {
         assertTokenStream(pinyin, expected);
     }
     
+    //Rúshì wǒwén
+    @Test
+    public void testPinyinTokenizer() throws IOException
+    {
+        String input = "yiwan nianjing";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("yi", "wan", "nian", "jing");
+        System.out.println("0 " + input);
+        Tokenizer tok = new PinyinTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        assertTokenStream(words, expected);
+    }
+    
     @Test
     public void testStopwordsFilter() throws IOException
     {

@@ -136,7 +136,7 @@ public class ChineseAnalyzerTests {
     @Test
     public void testPYstrict2PYlazy() throws IOException
     {
-        String input = "Rú shì wǒ wén. Yī shí fú zài luó yuè qí qí dū jué shān zhōng. "
+        String input = "Rúshì wǒwén. Yī shí fú zài luó yuè qí qí dū jué shān zhōng. "
                 + "Yǔ dà bǐ qiū zhòng qiān èr bǎi wǔ shí rén pú sà wǔ qiān rén jù.";
         List<String> expected = Arrays.asList("ru", "shi", "wo", "wen", "yi", "shi", "fu", 
                 "zai", "luo", "yue", "qi", "qi", "du", "jue", "shan", "zhong", "yu", "da", 
@@ -170,7 +170,7 @@ public class ChineseAnalyzerTests {
     @Test
     public void testPYlazy() throws IOException
     {
-        String input = "Ru sHi Wo weN. Yi shi fu zai luo yue qi qi du jue shan zhong. "
+        String input = "RusHi Wowen. Yi shi fu zai luo yue qi qi du jue shan zhong. "
                 + "Yu da bi qiu zhong qian er bai wu shi ren pu sa wu qian ren ju.";
         List<String> expected = Arrays.asList("ru", "shi", "wo", "wen", "yi", "shi", "fu", 
                 "zai", "luo", "yue", "qi", "qi", "du", "jue", "shan", "zhong", "yu", "da", 
