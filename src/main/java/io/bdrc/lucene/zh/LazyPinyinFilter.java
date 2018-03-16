@@ -72,6 +72,12 @@ public class LazyPinyinFilter extends TokenFilter {
         map.put("ǘ", "u");
         map.put("ǚ", "u");
         map.put("ǜ", "u");
+        // unexpected because not vowels, yet found in Unihan Pinyin fields
+        map.put("̀", "");    // U+0300 Combining Grave Accent (simply deleted here)
+        map.put("ḿ", "m");
+        map.put("ǹ", "n");
+        map.put("ń", "n");
+        map.put("ň", "n");
         return map;
     }
 

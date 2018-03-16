@@ -1,5 +1,6 @@
 package org.elasticsearch.index.analysis;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -7,7 +8,10 @@ import java.util.List;
  * Created by medcl on 16/10/13.
  */
 public class PinyinAlphabetTokenizer {
-
+        
+        static List<Character> unihanPinyinDiacritics = Arrays.asList('ā', 'á', 'ǎ', 'à', 'ē', 'é', 'ě', 'è', 'ī', 'í', 'ǐ', 'ì', 
+                'ō', 'ó', 'ǒ', 'ò', 'ū', 'ú', 'ǔ', 'ù', 'ǖ', 'ǘ', 'ǚ', 'ǜ', 'ǹ', '̀', 'ḿ', 'ń', 'ň');
+    
         public static List<String> walk(String text) {
             int maxLength=6;
             text = text.toLowerCase();
@@ -16,7 +20,7 @@ public class PinyinAlphabetTokenizer {
             boolean lastWord=true;
             for (int i = 0; i < text.length(); i++) {
                 char c = text.charAt(i);
-                if ((c > 96 && c < 123) || (c > 64 && c < 91)) {
+                if ((c > 96 && c < 123) || (c > 64 && c < 91) || unihanPinyinDiacritics.contains(c)) {
                     if(!lastWord){
                         String str = buffer.toString();
                         buffer.setLength(0);
