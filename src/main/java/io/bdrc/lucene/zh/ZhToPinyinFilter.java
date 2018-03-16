@@ -40,11 +40,11 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
  *
  */
 
-public class PinyinFilter extends TokenFilter {
+public class ZhToPinyinFilter extends TokenFilter {
 
     private HashMap<String, String> map;
 
-    public PinyinFilter(TokenStream in) throws IOException {
+    public ZhToPinyinFilter(TokenStream in) throws IOException {
         super(in);
         map = getMapping();
     }
@@ -53,7 +53,7 @@ public class PinyinFilter extends TokenFilter {
         String fileName = "src/main/resources/pinyin.tsv";
         BufferedReader br;
         InputStream stream = null;
-        stream = PinyinFilter.class.getResourceAsStream("/pinyin.tsv");
+        stream = ZhToPinyinFilter.class.getResourceAsStream("/pinyin.tsv");
         if (stream == null) { // we're not using the jar, these is no resource, assuming we're running the
                               // code
             br = new BufferedReader(new FileReader(fileName));

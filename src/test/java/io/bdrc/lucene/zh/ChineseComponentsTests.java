@@ -32,6 +32,7 @@ import java.util.List;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.junit.Test;
@@ -134,7 +135,7 @@ public class ChineseComponentsTests  {
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);
         TokenStream zhOnly = new ZhOnlyFilter(words);
-        TokenStream pinyin = new PinyinFilter(zhOnly);
+        TokenStream pinyin = new ZhToPinyinFilter(zhOnly);
         assertTokenStream(pinyin, expected);
     }
     
@@ -150,7 +151,7 @@ public class ChineseComponentsTests  {
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(reader, tok);
         TokenStream zhOnly = new ZhOnlyFilter(words);
-        TokenStream pinyin = new PinyinFilter(zhOnly);
+        TokenStream pinyin = new ZhToPinyinFilter(zhOnly);
         assertTokenStream(pinyin, expected);
     }
     
@@ -168,7 +169,6 @@ public class ChineseComponentsTests  {
         assertTokenStream(pinyin, expected);
     }
     
-    //Rúshì wǒwén
     @Test
     public void testPinyinTokenizer() throws IOException
     {
@@ -176,9 +176,10 @@ public class ChineseComponentsTests  {
         Reader reader = new StringReader(input);
         List<String> expected = Arrays.asList("yi", "wan", "nian", "jing");
         System.out.println("0 " + input);
-        Tokenizer tok = new PinyinTokenizer();
+        Tokenizer tok = new WhitespaceTokenizer();
         TokenStream words = tokenize(reader, tok);
-        assertTokenStream(words, expected);
+        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
+        assertTokenStream(pinyin, expected);
     }
     
     @Test
@@ -208,6 +209,20 @@ public class ChineseComponentsTests  {
         Tokenizer tok = new StandardTokenizer();
         TokenStream words = tokenize(noStops, tok);
         assertTokenStream(words, expected);
+    }
+    
+    @Test
+    public void testConvertPYstrictWithNumbers() throws IOException
+    {
+        String input = "yī wàn nián jīng āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("yi", "wan", "nian", "jing", 
+                "aaaaeeeeiiiioooouuuuuuuu");
+        System.out.println("0 " + input);
+        Tokenizer tok = new StandardTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        TokenStream pinyin = new LazyPinyinFilter(words);
+        assertTokenStream(pinyin, expected);
     }
     
     @Test

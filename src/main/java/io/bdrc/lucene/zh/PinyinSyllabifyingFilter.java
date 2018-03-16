@@ -20,76 +20,68 @@
 package io.bdrc.lucene.zh;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.LinkedList;
 
-import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.TokenFilter;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 
 /**
- * A Pinyin syllable Tokenizer that uses PinyinAlphabetTokenizer under the hood
+ * A Pinyin syllable Filter that uses PinyinAlphabetTokenizer under the hood
  * 
  * note: see the limitation described in PinyinAlphabetTokenizer
  * 
  * @author drupchen
  *
  */
-public class PinyinTokenizer extends Tokenizer{
-    List<String> tokens = null;
-    int idx = 0;
+public class PinyinSyllabifyingFilter extends TokenFilter{
+    LinkedList<String> tokens = new LinkedList<String>();
     int start = 0;
     int end = 0;
+    
+    protected PinyinSyllabifyingFilter(TokenStream in) {
+        super(in);
+        
+        // TODO Auto-generated constructor stub
+    }
     
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     
-    StringBuilder builder = null;
-    
     @Override
     public final boolean incrementToken() throws IOException {
-        /* getting the string back from the input Reader */
-        if (builder == null) {
-            // adapted from https://stackoverflow.com/a/17751100
-            builder = new StringBuilder();
-            int charsRead = -1;
-            char[] chars = new char[100];
-            do {
-                charsRead = input.read(chars,0,chars.length);
-                //if we have valid chars, append them to end of string.
-                if(charsRead>0)
-                    builder.append(chars,0,charsRead);
-            } while(charsRead>0);
-        }
-        
-        
         /* initialize the tokens */
-        if (tokens == null) {
-            tokens = PinyinAlphabetTokenizer.walk(builder.toString());
+        if (tokens.isEmpty()) {
+            input.incrementToken();
+            start = offsetAtt.startOffset();
+            tokens.addAll(PinyinAlphabetTokenizer.walk(termAtt.toString()));
         }
         
-        
-        
-        while (idx < tokens.size()) {
-            String token = tokens.get(idx);
+        while (!tokens.isEmpty()) {
+            String token = tokens.removeFirst();
             
             /* update offsets */
             start = end;
             end += token.length();
             
             if (PinyinAlphabetDict.getInstance().match(token)) {
-                /*  */
                 termAtt.setEmpty().append(token);
                 
                 termAtt.setLength(end - start);
-                offsetAtt.setOffset(correctOffset(start), correctOffset(end));
+                offsetAtt.setOffset(start, end);
                 
-                idx ++;
                 return true;
             } else {
-                idx ++;
+                /* initialize the tokens */
+                if (tokens.isEmpty()) {
+                    input.incrementToken();
+                    start = offsetAtt.startOffset();
+                    tokens.addAll(PinyinAlphabetTokenizer.walk(termAtt.toString()));
+                }
                 continue;
             }
         }
-        return false;
+        return false;        
     }
 }

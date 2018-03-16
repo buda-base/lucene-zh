@@ -27,6 +27,7 @@ import java.security.InvalidParameterException;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 
 /**
@@ -208,7 +209,7 @@ public final class ChineseAnalyzer extends Analyzer {
         /* tokenizes in ideograms or in words separated by punctuation.*/
         Tokenizer tok;
         if (this.inputEncoding.startsWith("PY")) {
-            tok = new PinyinTokenizer();
+            tok = new WhitespaceTokenizer();
         } else {
             tok = new StandardTokenizer();
         }
@@ -262,7 +263,7 @@ public final class ChineseAnalyzer extends Analyzer {
         /* indexing from ideograms to pinyin */
         } else if (this.indexEncoding.startsWith("PY") && this.inputEncoding.endsWith("C")) {
             try {
-                tokenStream = new PinyinFilter(tokenStream);
+                tokenStream = new ZhToPinyinFilter(tokenStream);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -274,10 +275,9 @@ public final class ChineseAnalyzer extends Analyzer {
         
         /* indexing from any encoding to PYlazy */
         if (this.inputEncoding.startsWith("PY")) {
+            tokenStream = new PinyinSyllabifyingFilter(tok);
             if (this.indexEncoding.equals("PYlazy") && !this.inputEncoding.equals("PYlazy")) {
-                tokenStream = new LazyPinyinFilter(tok);    
-            } else {
-                return new TokenStreamComponents(tok);
+                tokenStream = new LazyPinyinFilter(tokenStream);    
             }
         }
         return new TokenStreamComponents(tok, tokenStream);

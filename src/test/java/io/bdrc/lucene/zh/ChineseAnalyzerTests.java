@@ -170,7 +170,7 @@ public class ChineseAnalyzerTests {
     @Test
     public void testPYlazy() throws IOException
     {
-        String input = "RusHi Wowen. Yi shi fu zai luo yue qi qi du jue shan zhong. "
+        String input = "RusHi  Wowen. Yi shi fu zai luo yue qi qi du jue shan zhong. "
                 + "Yu da bi qiu zhong qian er bai wu shi ren pu sa wu qian ren ju.";
         List<String> expected = Arrays.asList("ru", "shi", "wo", "wen", "yi", "shi", "fu", 
                 "zai", "luo", "yue", "qi", "qi", "du", "jue", "shan", "zhong", "yu", "da", 

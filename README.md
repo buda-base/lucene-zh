@@ -39,10 +39,9 @@ ChineseAnalyzer(String profile)
 
 Produces ideogram-based tokens(it incorporated the historical Chinese Tokenizer). 
 
-#### PinyinTokenizer
+#### WhitespaceTokenizer
 
-Produces syllable-based tokens using `PinyinAlphabetTokenizer`.
-TODO: reimplement it to lift the limitation of keeping the whole input into a String. (see [here](src/main/java/io/bdrc/lucene/zh/PinyinAlphabetTokenizer.java)) 
+Used together with `PinyinSyllabifyingFilter` in order to avoid giving it big strings.
 
 ### Filters
 
@@ -50,7 +49,7 @@ TODO: reimplement it to lift the limitation of keeping the whole input into a St
 
 Leverages Unihan data to replace token content with the SC equivalent.
 
-#### PinyinFilter (TokenFilter)
+#### ZhToPinyinFilter (TokenFilter)
 
 Replaces the token content(TC and SC) with the pinyin transcription. 
 
@@ -62,11 +61,10 @@ Removes tone marks in Pinyin.
 
 Used as a pre-processing step for PY indexing
 
-#### PySylabifierFilter
+#### PinyinSyllabifyingFilter (TokenFilter)
 
-Produces syllables from pinyin-encoded text (either lazy or normal)
-
-TODO: determine the best strategy to do it
+Produces syllable-based tokens using `PinyinAlphabetTokenizer`.
+Supports both strict and lazy pinyin.
 
 #### ZhSynonymsFilter (MappingCharFilter)
 

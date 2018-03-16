@@ -28,12 +28,9 @@ import java.util.List;
  * Taken from {@link https://github.com/medcl/elasticsearch-analysis-pinyin}
  * and adapted to fit in PinyinTokenizer.
  * 
- * Takes the input string, tries to match a substring where: 
+ * Takes the input string(a pinyin token) and tries to match a substring where: 
  *      - starting index: the end of the last found syllable
  *      - ending index: length of input string or less (decrements until a match is found)  
- * 
- * Limitation: it has to read the Lucene input stream into a String, so potentially
- * problematic for indexing full volumes in Pinyin
  * 
  * Created by medcl ({@link https://github.com/medcl}) on 16/10/13.
  * 
