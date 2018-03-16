@@ -23,14 +23,10 @@ package io.bdrc.lucene.zh;
 import java.io.IOException;
 import java.io.Reader;
 import java.security.InvalidParameterException;
-import java.util.regex.Pattern;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.core.LowerCaseFilter;
-import org.apache.lucene.analysis.pattern.PatternReplaceCharFilter;
-import org.apache.lucene.analysis.pattern.PatternTokenizer;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 
 /**
@@ -253,11 +249,6 @@ public final class ChineseAnalyzer extends Analyzer {
                     e.printStackTrace();
                 }
             }
-        
-        } else if (this.inputEncoding.startsWith("PY")) {
-            tokenStream = new LowerCaseFilter(tok);
-            
-            /* Syllabify Pinyin */
         }
 
         /* indexing from TC to SC */
@@ -275,13 +266,20 @@ public final class ChineseAnalyzer extends Analyzer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            
+            if (this.indexEncoding.equals("PYlazy")) {
+                tokenStream = new LazyPinyinFilter(tokenStream);
+            }
         }
         
         /* indexing from any encoding to PYlazy */
-        if (this.indexEncoding.equals("PYlazy") && !this.inputEncoding.equals("PYlazy")) {
-            tokenStream = new LazyPinyinFilter(tokenStream);
+        if (this.inputEncoding.startsWith("PY")) {
+            if (this.indexEncoding.equals("PYlazy") && !this.inputEncoding.equals("PYlazy")) {
+                tokenStream = new LazyPinyinFilter(tok);    
+            } else {
+                return new TokenStreamComponents(tok);
+            }
         }
-        
         return new TokenStreamComponents(tok, tokenStream);
     }
 }
