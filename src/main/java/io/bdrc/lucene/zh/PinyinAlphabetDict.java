@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * 
  * Taken from {@link https://github.com/medcl/elasticsearch-analysis-pinyin}
- * and adapted to fit in PinyinTokenizer.
+ * and adapted to fit in PinyinTokenFilter.
  * 
  * Created by medcl ({@link https://github.com/medcl}) on 16/10/13.
  * 

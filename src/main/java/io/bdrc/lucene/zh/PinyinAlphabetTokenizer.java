@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * 
  * Taken from {@link https://github.com/medcl/elasticsearch-analysis-pinyin}
- * and adapted to fit in PinyinTokenizer.
+ * and adapted to fit in PinyinTokenFilter.
  * 
  * Takes the input string(a pinyin token) and tries to match a substring where: 
  *      - starting index: the end of the last found syllable
