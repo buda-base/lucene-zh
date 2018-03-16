@@ -33,10 +33,16 @@ ChineseAnalyzer(String profile)
 
 ## Components
 
-### Tokenizer
+### Tokenizers
 
-StandardTokenizer is used(it incorporated the historical Chinese Tokenizer). 
-Tokens produced are ideograms.
+#### StandardTokenizer
+
+Produces ideogram-based tokens(it incorporated the historical Chinese Tokenizer). 
+
+#### PinyinTokenizer
+
+Produces syllable-based tokens using `PinyinAlphabetTokenizer`.
+TODO: reimplement it to lift the limitation of keeping the whole input into a String. (see [here](src/main/java/io/bdrc/lucene/zh/PinyinAlphabetTokenizer.java)) 
 
 ### Filters
 

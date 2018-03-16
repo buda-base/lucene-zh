@@ -1,11 +1,42 @@
-package org.elasticsearch.index.analysis;
+/*******************************************************************************
+ * Copyright (c) 2018 Buddhist Digital Resource Center (BDRC)
+ *
+ * If this file is a derivation of another work the license header will appear
+ * below; otherwise, this work is licensed under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with the
+ * License.
+ *
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
+package io.bdrc.lucene.zh;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by medcl on 16/10/13.
+ * 
+ * Taken from {@link https://github.com/medcl/elasticsearch-analysis-pinyin}
+ * and adapted to fit in PinyinTokenizer.
+ * 
+ * Takes the input string, tries to match a substring where: 
+ *      - starting index: the end of the last found syllable
+ *      - ending index: length of input string or less (decrements until a match is found)  
+ * 
+ * Limitation: it has to read the Lucene input stream into a String, so potentially
+ * problematic for indexing full volumes in Pinyin
+ * 
+ * Created by medcl ({@link https://github.com/medcl}) on 16/10/13.
+ * 
  */
 public class PinyinAlphabetTokenizer {
         
