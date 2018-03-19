@@ -45,6 +45,10 @@ Used together with `PinyinSyllabifyingFilter` in order to avoid giving it big st
 
 ### Filters
 
+#### PinyinNormalizingFilter (MappingCharFilter)
+
+TODO: when we have more pinyin data or when we know how users type their queries, assess if the normalization is sufficient or not.
+
 #### TC2SCFilter (TokenFilter)
 
 Leverages Unihan data to replace token content with the SC equivalent.

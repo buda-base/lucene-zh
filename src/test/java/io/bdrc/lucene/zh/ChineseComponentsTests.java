@@ -282,6 +282,34 @@ public class ChineseComponentsTests  {
         TokenStream pinyin = new PinyinSyllabifyingFilter(words);
         assertTokenStream(pinyin, expected);
     }
+
+    @Test
+    public void testSyllabifier4() throws IOException
+    {
+        // from https://github.com/pepebecker/pinyin-split/blob/master/test/index.js
+        String input = "wodemaoxihuanheniunai";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("wo", "de", "mao", "xi", "huan", "he", "niu", "nai");
+        System.out.println("0 " + input);
+        Tokenizer tok = new WhitespaceTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
+        assertTokenStream(pinyin, expected);
+    }
+    
+    @Test
+    public void testSyllabifier5() throws IOException
+    {
+        // from https://github.com/pepebecker/pinyin-split/blob/master/test/index.js
+        String input = "dérěwǒfèndòudǒuwǒrènwèi";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("dé", "rě", "wǒ", "fèn", "dòu", "dǒu", "wǒ", "rèn", "wèi");
+        System.out.println("0 " + input);
+        Tokenizer tok = new WhitespaceTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
+        assertTokenStream(pinyin, expected);
+    }
     
     @Test
     public void bugSimplifiedChinese() throws IOException
@@ -296,5 +324,19 @@ public class ChineseComponentsTests  {
         TokenStream zhOnly = new ZhOnlyFilter(words);
         TokenStream sc = new TC2SCFilter(zhOnly);
         assertTokenStream(sc, expected);
+    }
+    
+    @Test
+    public void bugSyllabifier1() throws IOException
+    {
+        // from https://github.com/pepebecker/pinyin-split/blob/master/test/index.js
+        String input = "heniu";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("he", "niu");
+        System.out.println("0 " + input);
+        Tokenizer tok = new WhitespaceTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
+        assertTokenStream(pinyin, expected);
     }
 }
