@@ -60,6 +60,11 @@
             <artifactId>lucene-analyzers-common</artifactId>
             <version>6.4.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.nlpcn</groupId>
+            <artifactId>nlp-lang</artifactId>
+            <version>1.7.6</version>
+        </dependency>
     </dependencies>
         <build>
         <resources>

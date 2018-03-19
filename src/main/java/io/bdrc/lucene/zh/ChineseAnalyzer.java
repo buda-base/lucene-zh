@@ -201,6 +201,11 @@ public final class ChineseAnalyzer extends Analyzer {
             }
         }
         
+         /* normalize all incoming Pinyin */
+        if (this.inputEncoding.startsWith("PY")) {
+            reader = new PinyinNormalizingFilter(reader);
+        }
+        
         return super.initReader(fieldName, reader);
     }
     

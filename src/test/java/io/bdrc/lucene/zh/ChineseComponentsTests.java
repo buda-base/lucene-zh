@@ -226,6 +226,64 @@ public class ChineseComponentsTests  {
     }
     
     @Test
+    public void testConvertPYNumbersToMarks() throws IOException
+    {
+        String input = "yi1 wan4 nian2 jing1 a1 a2 a3 a4 e1 e2 e3 e4 i1 i2 i3 i4 o1 o2 o3 o4 u1 u2 u3 u4 v1 v2 v3 v4";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("yī", "wàn", "nián", "jīng", "ā", "á", "ǎ", "à", "ē", "é", "ě", "è", 
+                "ī", "í", "ǐ", "ì", "ō", "ó", "ǒ", "ò", "ū", "ú", "ǔ", "ù", "ǖ", "ǘ", "ǚ", "ǜ");
+        System.out.println("0 " + input);
+        Tokenizer tok = new WhitespaceTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        TokenStream pinyin = new PinyinToneNumber2ToneMarkFilter(words);
+        assertTokenStream(pinyin, expected);
+    }
+    
+    @Test
+    public void testSyllabifier1() throws IOException
+    {
+        // from http://pinyin.info/romanization/hanyu/syllable_boundaries.html
+        String input = "fěnbǐ mǎnyì lángān dòngwù bàofēngyǔ bànchéng zhēnshi wǎng zhàn tāngrshì shuǐcōngrshìde";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("fěn", "bǐ", "mǎn", "yì", "lán", "gān", "dòng", "wù", "bào", "fēng", 
+                "yǔ", "bàn", "chéng", "zhēn", "shi", "wǎng", "zhàn", "tāngr", "shì", "shuǐ", "cōngr", "shì", "de");
+        System.out.println("0 " + input);
+        Tokenizer tok = new WhitespaceTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
+        assertTokenStream(pinyin, expected);
+    }
+    
+    @Test
+    public void testSyllabifier2() throws IOException
+    {
+        // from http://pinyin.info/romanization/hanyu/apostrophes.html
+        String input = "cháng'ān chāo'é dān'ǒuhūn tiān'ānmén é'ér dìèr ŌuĀnhuì";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("cháng", "ān", "chāo", "é", "dān", "ǒu", 
+                "hūn", "tiān", "ān", "mén", "é", "ér", "dì", "èr", "Ōu", "Ān", "huì");
+        System.out.println("0 " + input);
+        Tokenizer tok = new WhitespaceTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
+        assertTokenStream(pinyin, expected);
+        reader.close();
+    }
+    
+    @Test
+    public void testSyllabifier3() throws IOException
+    {
+        String input = "biaoier";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("biao", "i", "er");
+        System.out.println("0 " + input);
+        Tokenizer tok = new WhitespaceTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
+        assertTokenStream(pinyin, expected);
+    }
+    
+    @Test
     public void bugSimplifiedChinese() throws IOException
     {
         // input and output from https://github.com/BYVoid/OpenCC/tree/master/test/testcases

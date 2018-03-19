@@ -37,8 +37,21 @@ import java.util.List;
  */
 public class PinyinAlphabetTokenizer {
         
-        static List<Character> unihanPinyinDiacritics = Arrays.asList('ā', 'á', 'ǎ', 'à', 'ē', 'é', 'ě', 'è', 'ī', 'í', 'ǐ', 'ì', 
-                'ō', 'ó', 'ǒ', 'ò', 'ū', 'ú', 'ǔ', 'ù', 'ǖ', 'ǘ', 'ǚ', 'ǜ', 'ǹ', '̀', 'ḿ', 'ń', 'ň');
+        static List<Character> unihanPinyinDiacritics = Arrays.asList(
+                'Ā', 'Á', 'Ǎ', 'À', 
+                'ā', 'á', 'ǎ', 'à', 
+                'Ē', 'É', 'Ě', 'È', 
+                'ē', 'é', 'ě', 'è', 
+                'Ī', 'Í', 'Ǐ', 'Ì', 
+                'ī', 'í', 'ǐ', 'ì', 
+                'Ō', 'Ó', 'Ǒ', 'Ò', 
+                'ō', 'ó', 'ǒ', 'ò', 
+                'Ū', 'Ú', 'Ǔ', 'Ù', 
+                'ū', 'ú', 'ǔ', 'ù', 
+                'Ǖ', 'Ǘ', 'Ǚ', 'Ǜ',
+                'ǖ', 'ǘ', 'ǚ', 'ǜ', 
+                // numbers for numbered Pinyin
+                '0', '1', '2', '3', '4', '5');
     
         public static List<String> walk(String text) {
             int maxLength=6;
