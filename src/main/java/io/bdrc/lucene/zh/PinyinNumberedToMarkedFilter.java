@@ -36,9 +36,11 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
  *
  *     1. If the syllable has an 'a' or 'e', put the tone over that vowel.
  *     2. If the syllable has 'ou', place the tone over the 'o'.
- *     3. Otherwise, put the tone on the last vowel.
+ *     3. Otherwise, put the tone on the last vowel. (both ü and v are allowed)
  *  
- *  If the syllable does not end with a tone number (from 0 to 5), the syllable is returned as is.
+ *  Syllables are returned as-is if:
+ *      - they don't end with a tone number (from 0 to 5).
+ *      - they don't contain a legal vowel
  * 
  * @author Hélios Hildt
  *
@@ -55,7 +57,7 @@ public class PinyinNumberedToMarkedFilter extends TokenFilter {
      * @param pinyinStr syllable to process 
      * @return
      */
-    public String numberedToMarked(String pinyinStr) {
+    static String numberedToMarked(String pinyinStr) {
         List<Character> toneNumbers = Arrays.asList('1', '2', '3', '4', '5', '0');
         final String markedVowels = "āáǎàaēéěèeīíǐìiōóǒòoūúǔùuǖǘǚǜü";
         HashMap<Character, Integer> rows = new HashMap<Character, Integer>();
@@ -65,9 +67,20 @@ public class PinyinNumberedToMarkedFilter extends TokenFilter {
         rows.put('o', 3);
         rows.put('u', 4);
         rows.put('v', 5);
+        rows.put('ü', 5);
         
         char number = pinyinStr.charAt(pinyinStr.length()-1);
-        if (toneNumbers.contains(number)) {
+        /* there is a numbered tone and a pinyin vowel */
+        if (toneNumbers.contains(number) && (pinyinStr.contains("a") || pinyinStr.contains("e")
+                || pinyinStr.contains("i") || pinyinStr.contains("o") || pinyinStr.contains("u")
+                || pinyinStr.contains("v") || pinyinStr.contains("ü"))) {
+            StringBuffer marked = new StringBuffer(pinyinStr);
+            marked.setLength(pinyinStr.length() - 1);   // remove tone number
+            /* neutral tone */
+            if (number == '5' || number == '0') {
+                return marked.toString();
+            }
+            
             /* find the index of the vowel to mark */
             int toMarkIdx = -1;
             char toMarkVowel;
@@ -90,26 +103,28 @@ public class PinyinNumberedToMarkedFilter extends TokenFilter {
                         pinyinStr.lastIndexOf('i'),
                         pinyinStr.lastIndexOf('o'),
                         pinyinStr.lastIndexOf('u'),
-                        pinyinStr.lastIndexOf('v'));
+                        pinyinStr.lastIndexOf('v'),
+                        pinyinStr.lastIndexOf('ü'));
                 Collections.sort(otherVowels);
                 Collections.reverse(otherVowels);
                 toMarkIdx = otherVowels.get(0);
                 toMarkVowel = pinyinStr.charAt(toMarkIdx);
             }
             
-            /* if (there is a vowel to mark) */
+            /* there is a vowel to mark */
             if (toMarkIdx != -1) {
                 char newVowel = markedVowels.charAt(rows.get(toMarkVowel) * 5 
                         + Character.getNumericValue(number) - 1);
                 
-                StringBuffer marked = new StringBuffer(pinyinStr);
-                marked.setLength(pinyinStr.length() - 1);   // remove tone number
                 marked.deleteCharAt(toMarkIdx);             // delete vowel without tone
                 marked.insert(toMarkIdx, newVowel);         // insert marked vowel
                 return marked.toString();
+             
+            /* there is no vowel to mark; return input as-is */
             } else {
                 return pinyinStr;
             }
+        /* there is no numbered tone */
         } else {
             return pinyinStr;
         }

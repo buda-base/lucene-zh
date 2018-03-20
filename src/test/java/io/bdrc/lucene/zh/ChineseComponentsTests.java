@@ -228,10 +228,19 @@ public class ChineseComponentsTests  {
     @Test
     public void testConvertPYNumbersToMarks() throws IOException
     {
-        String input = "yi1 wan4 nian2 jing1 a1 a2 a3 a4 e1 e2 e3 e4 i1 i2 i3 i4 o1 o2 o3 o4 u1 u2 u3 u4 v1 v2 v3 v4";
-        Reader reader = new StringReader(input);
-        List<String> expected = Arrays.asList("yī", "wàn", "nián", "jīng", "ā", "á", "ǎ", "à", "ē", "é", "ě", "è", 
-                "ī", "í", "ǐ", "ì", "ō", "ó", "ǒ", "ò", "ū", "ú", "ǔ", "ù", "ǖ", "ǘ", "ǚ", "ǜ");
+        // TESTED CASES: 
+        // 0: non-pinyin syl, 1: syl without vowel, 
+        // 2 and 3: syls with neutral tone
+        // 4, 5 and 6: syl with a, e and ou
+        // 7: syl where last syl should be marked
+        // 8 and 9: syls with ü and v 
+        // 10 and later: all normal tones
+        String input = "+@/* r3 yi0 yi5 miao1 fei1 zhou3 huo3 lün1 lvn2 yi1 wan4 nian2 jing1 a1 a2 a3 a4 e1 e2 e3 e4 i1 i2 i3 i4 "
+                + "o1 o2 o3 o4 u1 u2 u3 u4 v1 v2 v3 v4";
+        Reader reader = new StringReader(input); 
+        List<String> expected = Arrays.asList("+@/*", "r3", "yi", "yi", "miāo", "fēi", "zhǒu", "huǒ", "lǖn", "lǘn", "yī", "wàn", "nián", 
+                "jīng", "ā", "á", "ǎ", "à", "ē", "é", "ě", "è", "ī", "í", "ǐ", "ì", "ō", "ó", "ǒ", "ò", "ū", "ú", 
+                "ǔ", "ù", "ǖ", "ǘ", "ǚ", "ǜ");
         System.out.println("0 " + input);
         Tokenizer tok = new WhitespaceTokenizer();
         TokenStream words = tokenize(reader, tok);
