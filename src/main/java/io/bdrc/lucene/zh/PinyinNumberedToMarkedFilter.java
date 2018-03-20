@@ -57,7 +57,7 @@ public class PinyinNumberedToMarkedFilter extends TokenFilter {
      * @param pinyinStr syllable to process 
      * @return
      */
-    static String numberedToMarked(String pinyinStr) {
+    public static String numberedToMarked(String pinyinStr) {
         List<Character> toneNumbers = Arrays.asList('1', '2', '3', '4', '5', '0');
         final String markedVowels = "āáǎàaēéěèeīíǐìiōóǒòoūúǔùuǖǘǚǜü";
         HashMap<Character, Integer> rows = new HashMap<Character, Integer>();

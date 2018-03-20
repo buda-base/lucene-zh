@@ -1,5 +1,6 @@
 package io.bdrc.lucene.zh;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -9,21 +10,45 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.util.RollingCharBuffer;
 
+import io.bdrc.lucene.stemmer.Row;
+import io.bdrc.lucene.stemmer.Trie;
+
 /**
- * Tokenizes Pinyin syllables
- * Implements the algorithm presented {@link https://github.com/tsroten/zhon/blob/develop/zhon/pinyin.py#L64}:
+ * Tokenizes any valid Pinyin text into syllables.
+ * Pinyin can indifferently be numbered Pinyin, marked Pinyin and lazy Pinyin
+ * or a mixture of any of them.
  * 
+ * Segmenting algorithm:
+ *      
+ *      Implements the algorithm presented {@link https://github.com/tsroten/zhon/blob/develop/zhon/pinyin.py#L64}:
  *      1. get the longest valid syllable (in the 421 syllables from {@link https://en.wikipedia.org/wiki/Pinyin_table#Overall_table} 
  *      2. If it ends in a consonant make sure it's not followed directly by a
  *         vowel (hyphens and apostrophes don't count).
  *      3. If the above didn't match, repeat for the next longest valid match.
  *      
- *            
- * @author drupchen
+ * Syllable breaks:
+ * 
+ *      Apostrophes and hyphens always induce a syllable break.
+ *      They are expected in the cases not covered by the described segmenting algorithm.
+ *      
+ *      "changan" yields "chan", "gan"
+ *      "chang'an" and "chang-an" yield "chang", "an"
+ * 
+ * Note: As explained {@link http://www.thefullwiki.org/Erhua}, the erhua phenomenon pertains to the
+ *      spoken Mandarin dialect and to some Northern dialects. As such, we don's support it since
+ *      we aim to index literary Chinese. "tangr" yields "tang", "r"
+ * 
+ * @author Hélios Hildt
  *
  */
 public class PinyinSyllableTokenizer extends Tokenizer{
-
+    private Trie scanner;
+    
+    /**
+     * 
+     * @throws FileNotFoundException 
+     * @throws IOException
+     */
     PinyinSyllableTokenizer () {
         init();
     }
@@ -36,8 +61,11 @@ public class PinyinSyllableTokenizer extends Tokenizer{
     
     private RollingCharBuffer ioBuffer;
     private final int charCount = 1; // the number of chars in a codepoint
+    private Row rootRow;
+    private Row currentRow;
     
     private void init() {
+        scanner = BuildCompiledTrie.buildTrie();
         ioBuffer = new RollingCharBuffer();
         ioBuffer.reset(input);
     }
@@ -71,59 +99,63 @@ public class PinyinSyllableTokenizer extends Tokenizer{
      * Lowercases all the token chars (filtering non-Pinyin accents is done by PinyinNormalizingFilter)
      */
     protected int normalize(int c) {
-      return Character.toLowerCase(c);
+        return Character.toLowerCase(c);
     }
 
     @Override
     public final boolean incrementToken() throws IOException {
-      clearAttributes();
-      ioBuffer.freeBefore(bufferIndex);
-      int length = 0;
-      int start = -1; // this variable is always initialized
-      int end = -1;
-      char[] buffer = termAtt.buffer();
-      while (true) {
-          final int c = normalize(ioBuffer.get(bufferIndex));    // take next char in ioBuffer and normalize it
-          bufferIndex += charCount;                   // increment bufferIndex for next value of c
+        clearAttributes();
+        ioBuffer.freeBefore(bufferIndex);
+        rootRow = scanner.getRow(scanner.getRoot());
+        int length = 0;
+        int start = -1; // this variable is always initialized
+        int end = -1;
+        currentRow = null;
+        char[] buffer = termAtt.buffer();
+        
+        while (true) {
+            final int c = normalize(ioBuffer.get(bufferIndex));    // take next char in ioBuffer and normalize it
+            bufferIndex += charCount;                   // increment bufferIndex for next value of c
 
-          if (isTokenChar(c)) {               // if it's a token char
-              if (length == 0) {                // start of token
-                  assert start == -1;
-                  start = offset + bufferIndex - charCount;
-                  end = start;
-              } else if (length >= buffer.length-1) { // check if a supplementary could run out of bounds
-                  buffer = termAtt.resizeBuffer(2+length); // make sure a supplementary fits in the buffer
-              }
-              end += charCount;
-              length += Character.toChars(c, buffer, length); // buffer it, normalized
-              if (length >= MAX_WORD_LEN) { // buffer overflow! make sure to check for >= surrogate pair could break == test
-                  break;
-              }
-          } else if (length > 0) {           // at non-Letter w/ chars
-              break;                           // return 'em
-          }
-      }
+            if (isTokenChar(c)) {               // if it's a token char
+                if (length == 0) {                // start of token
+                    assert start == -1;
+                    start = offset + bufferIndex - charCount;
+                    end = start;
+                } else if (length >= buffer.length-1) { // check if a supplementary could run out of bounds
+                    buffer = termAtt.resizeBuffer(2+length); // make sure a supplementary fits in the buffer
+                }
+                end += charCount;
+                length += Character.toChars(c, buffer, length); // buffer it, normalized
+                if (length >= MAX_WORD_LEN) { // buffer overflow! make sure to check for >= surrogate pair could break == test
+                    break;
+                }
+            } else if (c == '\'') {
+              // check 
+            } else if (length > 0) {           // at non-Letter w/ chars
+                break;                           // return 'em
+            }
+        }
 
-      termAtt.setLength(length);
-      assert start != -1;
-      offsetAtt.setOffset(correctOffset(start), finalOffset = correctOffset(end));
-      return true;
-      
+        termAtt.setLength(length);
+        assert start != -1;
+        offsetAtt.setOffset(correctOffset(start), finalOffset = correctOffset(end));
+        return true;
     }
     
     @Override
     public final void end() throws IOException {
-      super.end();
-      // set final offset
-      offsetAtt.setOffset(finalOffset, finalOffset);
+        super.end();
+        // set final offset
+        offsetAtt.setOffset(finalOffset, finalOffset);
     }
 
     @Override
     public void reset() throws IOException {
-      super.reset();
-      bufferIndex = 0;
-      offset = 0;
-      finalOffset = 0;
-      ioBuffer.reset(input); // make sure to reset the IO buffer!!
+        super.reset();
+        bufferIndex = 0;
+        offset = 0;
+        finalOffset = 0;
+        ioBuffer.reset(input); // make sure to reset the IO buffer!!
     }
 }

@@ -1,7 +1,5 @@
 package io.bdrc.lucene.zh;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,13 +21,14 @@ public class BuildCompiledTrie {
      * 
      * for every syllable, the following variants are generated:
      *          - lazy Pinyin (syllable as-is)
-     *          - for each of the four tones:
+     *          - strict Pinyin
+     *            for each of the four tones:
      *              - a numbered version
      *              - a marked version
      * 
      * @return the non-optimized Trie
      */
-    static Trie buildTrie() throws FileNotFoundException, IOException {
+    static Trie buildTrie() {
         List<String> validSyllables = Arrays.asList("zhi", "chi", "shi", "ri", "zi", "ci", "si",
                 "a", "ba", "pa", "ma", "fa", "da", "ta", "na", "la", "ga", "ka", "ha", "zha", "cha", "sha", "za", "ca", "sa",
                 "o", "bo", "po", "mo", "fo", "lo",
