@@ -49,6 +49,11 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.bdrc.lucene</groupId>
+            <artifactId>stemmer</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-core -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -59,11 +64,6 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
             <version>6.4.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.nlpcn</groupId>
-            <artifactId>nlp-lang</artifactId>
-            <version>1.7.6</version>
         </dependency>
     </dependencies>
         <build>
