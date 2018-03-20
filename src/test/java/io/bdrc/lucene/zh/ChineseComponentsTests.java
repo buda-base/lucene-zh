@@ -235,7 +235,7 @@ public class ChineseComponentsTests  {
         System.out.println("0 " + input);
         Tokenizer tok = new WhitespaceTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream pinyin = new PinyinToneNumber2ToneMarkFilter(words);
+        TokenStream pinyin = new PinyinNumberedToMarkedFilter(words);
         assertTokenStream(pinyin, expected);
     }
     
