@@ -30,13 +30,19 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 /**
- * Traditional Chinese -> Simplified Chinese charfilter
+ * Token Filter to convert a Pinyin syllable with tone numbers to tone marks
  * 
+ *  Implements the following algorithm(from {@link https://github.com/tsroten/zhon/blob/develop/tests/test-pinyin.py#L99}:
+ *
+ *     1. If the syllable has an 'a' or 'e', put the tone over that vowel.
+ *     2. If the syllable has 'ou', place the tone over the 'o'.
+ *     3. Otherwise, put the tone on the last vowel.
+ *  
+ *  If the syllable does not end with a tone number (from 0 to 5), the syllable is returned as is.
  * 
  * @author Hélios Hildt
  *
  */
-
 public class PinyinNumberedToMarkedFilter extends TokenFilter {
 
     public PinyinNumberedToMarkedFilter(TokenStream in) throws IOException {
@@ -45,16 +51,8 @@ public class PinyinNumberedToMarkedFilter extends TokenFilter {
 
     /**
      * Converts a Pinyin syllable with tone numbers to tone marks
-     * 
-     *  Implements the following algorithm(from {@link https://github.com/tsroten/zhon/blob/develop/tests/test-pinyin.py#L99}:
-     *
-     *     1. If the syllable has an 'a' or 'e', put the tone over that vowel.
-     *     2. If the syllable has 'ou', place the tone over the 'o'.
-     *     3. Otherwise, put the tone on the last vowel.
      *  
-     *  If the syllable does not end with a tone number (from 0 to 5), the syllable is returned as is.
-     *  
-     * @param pinyinStr Syllable to process 
+     * @param pinyinStr syllable to process 
      * @return
      */
     public String numberedToMarked(String pinyinStr) {
@@ -101,12 +99,13 @@ public class PinyinNumberedToMarkedFilter extends TokenFilter {
             
             /* if (there is a vowel to mark) */
             if (toMarkIdx != -1) {
-                int row = rows.get(toMarkVowel);
+                char newVowel = markedVowels.charAt(rows.get(toMarkVowel) * 5 
+                        + Character.getNumericValue(number) - 1);
                 
                 StringBuffer marked = new StringBuffer(pinyinStr);
-                marked.setLength(pinyinStr.length() - 1);
-                marked.replace(toMarkIdx, toMarkIdx + 1, 
-                        Character.toString(markedVowels.charAt(row * 5 + Character.getNumericValue(number) - 1)));
+                marked.setLength(pinyinStr.length() - 1);   // remove tone number
+                marked.deleteCharAt(toMarkIdx);             // delete vowel without tone
+                marked.insert(toMarkIdx, newVowel);         // insert marked vowel
                 return marked.toString();
             } else {
                 return pinyinStr;
