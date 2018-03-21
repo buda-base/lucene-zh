@@ -249,6 +249,18 @@ public class ChineseComponentsTests  {
     }
     
     @Test
+    public void testPinyinSyllableTokenizer1() throws IOException
+    {
+        String input = "changan chang'an biaoier";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("chan", "gan", "chang", "an", "biao", "i", "er");
+        System.out.println("0 " + input);
+        Tokenizer tok = new PinyinSyllableTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        assertTokenStream(words, expected);
+    }
+    
+    @Test
     public void testSyllabifier1() throws IOException
     {
         // from http://pinyin.info/romanization/hanyu/syllable_boundaries.html

@@ -1,13 +1,18 @@
 package io.bdrc.lucene.zh;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.analysis.util.RollingCharBuffer;
 
 import io.bdrc.lucene.stemmer.Row;
@@ -25,6 +30,7 @@ import io.bdrc.lucene.stemmer.Trie;
  *      2. If it ends in a consonant make sure it's not followed directly by a
  *         vowel (hyphens and apostrophes don't count).
  *      3. If the above didn't match, repeat for the next longest valid match.
+ *      note: as found in the linked table, the only valid ending consonants are 'n' and 'g'
  *      
  * Syllable breaks:
  * 
@@ -49,23 +55,75 @@ public class PinyinSyllableTokenizer extends Tokenizer{
      * @throws FileNotFoundException 
      * @throws IOException
      */
-    PinyinSyllableTokenizer () {
+    PinyinSyllableTokenizer () throws FileNotFoundException, IOException {
         init();
     }
     
-    private int offset = 0, bufferIndex = 0, finalOffset = 0;
+    private int bufferIndex = 0, finalOffset = 0;
     private static final int MAX_WORD_LEN = 255;
     
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
+    private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
     
     private RollingCharBuffer ioBuffer;
-    private final int charCount = 1; // the number of chars in a codepoint
     private Row rootRow;
     private Row currentRow;
+    private int tokenLength;
+    private int tokenStart;
+    private int tokenEnd;
     
-    private void init() {
-        scanner = BuildCompiledTrie.buildTrie();
+    private List<Character> unihanPinyinDiacritics = Arrays.asList(
+            'Ā', 'Á', 'Ǎ', 'À', 
+            'ā', 'á', 'ǎ', 'à', 
+            'Ē', 'É', 'Ě', 'È', 
+            'ē', 'é', 'ě', 'è', 
+            'Ī', 'Í', 'Ǐ', 'Ì', 
+            'ī', 'í', 'ǐ', 'ì', 
+            'Ō', 'Ó', 'Ǒ', 'Ò', 
+            'ō', 'ó', 'ǒ', 'ò', 
+            'Ū', 'Ú', 'Ǔ', 'Ù', 
+            'ū', 'ú', 'ǔ', 'ù', 
+            'Ǖ', 'Ǘ', 'Ǚ', 'Ǜ',
+            'ǖ', 'ǘ', 'ǚ', 'ǜ', 
+            // numbers for numbered Pinyin
+            '0', '1', '2', '3', '4', '5');
+    private List <Character> pinyinVowels = Arrays.asList(
+            'a', 'e', 'i', 'o', 'u', 'v', 'ü');
+    
+    /**
+     * 
+     * @throws FileNotFoundException  the file of the compiled Trie is not found
+     * @throws IOException  the file of the compiled Trie can't be opened
+     */
+    private void init() throws FileNotFoundException, IOException {
+        InputStream stream = null;
+        stream = PinyinSyllableTokenizer.class.getResourceAsStream("/zh_py-compiled-trie.dump");
+        if (stream == null) {  // we're not using the jar, there is no resource, assuming we're running the code
+            String compiledTrieName = "src/main/resources/zh_py-compiled-trie.dump";
+            if (!new File(compiledTrieName).exists()) {
+                System.out.println("The default compiled Trie is not found ; building it will take some time!");
+                long start = System.currentTimeMillis();
+                this.scanner = BuildCompiledTrie.compileTrie();
+                long end = System.currentTimeMillis();
+                System.out.println("Trie built in " + (end - start) / 1000 + "s.");
+                ioBuffer = new RollingCharBuffer();
+                ioBuffer.reset(input);
+            } else {
+                init(new FileInputStream(compiledTrieName));    
+            }   
+        } else {
+            init(stream);
+        }
+    }
+    
+    /**
+     * Opens an existing compiled Trie
+     * 
+     * @param inputStream the compiled Trie opened as a Stream 
+     */
+    private void init(InputStream inputStream) throws FileNotFoundException, IOException {
+        this.scanner = new Trie(new DataInputStream(inputStream));
         ioBuffer = new RollingCharBuffer();
         ioBuffer.reset(input);
     }
@@ -77,21 +135,6 @@ public class PinyinSyllableTokenizer extends Tokenizer{
      * boundaries and are not included in tokens.
      */
     protected boolean isTokenChar(int c) {
-        List<Character> unihanPinyinDiacritics = Arrays.asList(
-                'Ā', 'Á', 'Ǎ', 'À', 
-                'ā', 'á', 'ǎ', 'à', 
-                'Ē', 'É', 'Ě', 'È', 
-                'ē', 'é', 'ě', 'è', 
-                'Ī', 'Í', 'Ǐ', 'Ì', 
-                'ī', 'í', 'ǐ', 'ì', 
-                'Ō', 'Ó', 'Ǒ', 'Ò', 
-                'ō', 'ó', 'ǒ', 'ò', 
-                'Ū', 'Ú', 'Ǔ', 'Ù', 
-                'ū', 'ú', 'ǔ', 'ù', 
-                'Ǖ', 'Ǘ', 'Ǚ', 'Ǜ',
-                'ǖ', 'ǘ', 'ǚ', 'ǜ', 
-                // numbers for numbered Pinyin
-                '0', '1', '2', '3', '4', '5');
         return (c > 96 && c < 123) || (c > 64 && c < 91) || unihanPinyinDiacritics.contains((char) c);
     }
 
@@ -106,41 +149,104 @@ public class PinyinSyllableTokenizer extends Tokenizer{
     public final boolean incrementToken() throws IOException {
         clearAttributes();
         ioBuffer.freeBefore(bufferIndex);
-        rootRow = scanner.getRow(scanner.getRoot());
-        int length = 0;
-        int start = -1; // this variable is always initialized
-        int end = -1;
+        
         currentRow = null;
-        char[] buffer = termAtt.buffer();
+        rootRow = scanner.getRow(scanner.getRoot());
+        
+        char[] tokenBuffer = termAtt.buffer();
+        tokenStart = bufferIndex;
+        tokenEnd = -1;
+        tokenLength = 0;
+        
+        boolean hasMatched = false;
+        boolean match = false;
+        boolean continuing = false;
         
         while (true) {
             final int c = normalize(ioBuffer.get(bufferIndex));    // take next char in ioBuffer and normalize it
-            bufferIndex += charCount;                   // increment bufferIndex for next value of c
-
-            if (isTokenChar(c)) {               // if it's a token char
-                if (length == 0) {                // start of token
-                    assert start == -1;
-                    start = offset + bufferIndex - charCount;
-                    end = start;
-                } else if (length >= buffer.length-1) { // check if a supplementary could run out of bounds
-                    buffer = termAtt.resizeBuffer(2+length); // make sure a supplementary fits in the buffer
+            bufferIndex ++;
+            /* when ioBuffer is empty (end of input, ...) */
+            if (c == -1) {
+                bufferIndex --;
+                if (tokenLength == 0) {
+                    finalOffset = correctOffset(bufferIndex);
+                    return false;
                 }
-                end += charCount;
-                length += Character.toChars(c, buffer, length); // buffer it, normalized
-                if (length >= MAX_WORD_LEN) { // buffer overflow! make sure to check for >= surrogate pair could break == test
+                break;
+            }
+            boolean debug = true;
+            if (debug) {System.out.println("\t" + (char) c);}
+            
+            if (isTokenChar(c)) {               // if it's a token char
+                
+                /* start of syllable or non-syl char */
+                if (tokenLength == 0) {
+                    match = tryToFindMatchIn(rootRow, c);
+                    continuing = tryToContinueDownTheTrie(rootRow, c);
+                    
+                } else {
+                    match = tryToFindMatchIn(currentRow, c);
+                    continuing = tryToContinueDownTheTrie(currentRow, c);                    
+                }
+                /* there was a match */
+                if (!hasMatched && match) {
+                    hasMatched = true;
+                }
+                
+                tokenEnd = bufferIndex;  // has to be incremented before breaking
+                
+                /* reached a non-syllable char */
+                if (!match && !continuing){
+                    /* if current char is a vowel and previous letter is 'g' or 'n' */
+                    int lastCharIdx = (tokenLength - 1 < 0) ? 0: tokenLength - 1;
+                    if (pinyinVowels.contains((char) c) && (termAtt.length() > 0 && (tokenBuffer[lastCharIdx] == 'g' 
+                            || tokenBuffer[lastCharIdx] == 'n'))) {
+                        tokenLength --;
+                        bufferIndex -= 2;
+                        break;
+                    
+                        /* there is a match or a non-match */
+                    } else {
+                        if (hasMatched) {
+                            bufferIndex -= 1;
+                            break;
+                        } else {
+                            IncrementTokenLengthAndAddCurrentCharTo(tokenBuffer, c);
+                            typeAtt.setType("non-word");
+                            break;
+                        }
+
+                    }
+                }
+                IncrementTokenLengthAndAddCurrentCharTo(tokenBuffer, c);
+                
+                if (tokenLength >= MAX_WORD_LEN) { // buffer overflow! make sure to check for >= surrogate pair could break == test
                     break;
                 }
-            } else if (c == '\'') {
-              // check 
-            } else if (length > 0) {           // at non-Letter w/ chars
+            } else if (tokenLength > 0) {           // at non-Letter w/ chars
                 break;                           // return 'em
             }
         }
 
-        termAtt.setLength(length);
-        assert start != -1;
-        offsetAtt.setOffset(correctOffset(start), finalOffset = correctOffset(end));
+        termAtt.setLength(tokenLength);
+        assert tokenStart != -1;
+        offsetAtt.setOffset(correctOffset(tokenStart), correctOffset(tokenEnd));
         return true;
+    }
+    
+    private boolean tryToContinueDownTheTrie(Row row, int c) {
+        int ref = row.getRef((char) c);
+        currentRow = (ref >= 0) ? scanner.getRow(ref) : null;
+        return (currentRow == null) ? false: true;
+    }
+    
+    private boolean tryToFindMatchIn(Row row, int c) {
+        return (row.getCmd((char) c) >= 0);
+    }
+    
+    private void IncrementTokenLengthAndAddCurrentCharTo(char[] tokenBuffer, int c) {
+        tokenLength += Character.toChars(normalize(c), tokenBuffer, tokenLength);   // add normalized c to tokenBuffer
+        termAtt.setLength(tokenLength);
     }
     
     @Override
@@ -154,7 +260,6 @@ public class PinyinSyllableTokenizer extends Tokenizer{
     public void reset() throws IOException {
         super.reset();
         bufferIndex = 0;
-        offset = 0;
         finalOffset = 0;
         ioBuffer.reset(input); // make sure to reset the IO buffer!!
     }

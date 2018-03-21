@@ -1,16 +1,29 @@
 package io.bdrc.lucene.zh;
 
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 
 import io.bdrc.lucene.stemmer.Trie;
 
 public class BuildCompiledTrie {
-    
+    static String outFile = "src/main/resources/zh_py-compiled-trie.dump";
 
     
-    public static void main(String [] args){
-        
+    public static void main(String [] args) throws FileNotFoundException, IOException{
+        storeTrie(buildTrie(), outFile);
+    }
+    
+
+    public static Trie compileTrie() throws FileNotFoundException, IOException {
+        Trie trie = buildTrie();
+        storeTrie(trie, outFile);
+        return trie;
     }
     
     /** 
@@ -33,7 +46,7 @@ public class BuildCompiledTrie {
                 "a", "ba", "pa", "ma", "fa", "da", "ta", "na", "la", "ga", "ka", "ha", "zha", "cha", "sha", "za", "ca", "sa",
                 "o", "bo", "po", "mo", "fo", "lo",
                 "e", "me", "de", "te", "ne", "le", "ge", "ke", "he", "zhe", "che", "she", "re", "ze", "ce", "se",
-                "ê",
+                "e",
                 "ai", "bai", "pai", "mai", "dai", "tai", "nai", "lai", "gai", "kai", "hai", "zhai", "chai", "shai", "zai", "cai", "sai",
                 "ei", "bei", "pei", "mei", "fei", "dei", "tei", "nei", "lei", "gei", "kei", "hei", "zhei", "shei", "zei", "sei",
                 "ao", "bao", "pao", "mao", "dao", "tao", "nao", "lao", "gao", "kao", "hao", "zhao", "chao", "shao", "rao", "zao", "cao", "sao",
@@ -73,14 +86,24 @@ public class BuildCompiledTrie {
         
         Trie trie = new Trie(true);
         for (String syl: validSyllables) {
-            trie.add(syl, "");
+            trie.add(syl, " ");
             for (int i = 1; i<= 4; i++) {
                 String numbered = syl + i;
-                trie.add(numbered, "");
-                trie.add(PinyinNumberedToMarkedFilter.numberedToMarked(numbered), "");
+                trie.add(numbered, " ");
+                trie.add(PinyinNumberedToMarkedFilter.numberedToMarked(numbered), " ");
             }
         }
         return trie;
+    }
+    
+    /**
+     * 
+     * @param trie  the trie to store in binary format
+     * @param outFilename  the path+filename of the output file
+     */
+    public static void storeTrie(Trie trie, String outFilename) throws FileNotFoundException, IOException {
+        OutputStream output = new DataOutputStream(new FileOutputStream(outFilename));
+        trie.store((DataOutput) output);
     }
     
 }
