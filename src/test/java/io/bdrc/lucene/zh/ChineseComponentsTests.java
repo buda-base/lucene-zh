@@ -176,10 +176,9 @@ public class ChineseComponentsTests  {
         Reader reader = new StringReader(input);
         List<String> expected = Arrays.asList("yi", "wan", "nian", "jing");
         System.out.println("0 " + input);
-        Tokenizer tok = new WhitespaceTokenizer();
+        Tokenizer tok = new PinyinSyllableTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
-        assertTokenStream(pinyin, expected);
+        assertTokenStream(words, expected);
     }
     
     @Test
@@ -267,12 +266,11 @@ public class ChineseComponentsTests  {
         String input = "fěnbǐ mǎnyì lángān dòngwù bàofēngyǔ bànchéng zhēnshi wǎng zhàn tāngrshì shuǐcōngrshìde";
         Reader reader = new StringReader(input);
         List<String> expected = Arrays.asList("fěn", "bǐ", "mǎn", "yì", "lán", "gān", "dòng", "wù", "bào", "fēng", 
-                "yǔ", "bàn", "chéng", "zhēn", "shi", "wǎng", "zhàn", "tāngr", "shì", "shuǐ", "cōngr", "shì", "de");
+                "yǔ", "bàn", "chéng", "zhēn", "shi", "wǎng", "zhàn", "tāng", "r", "shì", "shuǐ", "cōng", "r", "shì", "de");
         System.out.println("0 " + input);
-        Tokenizer tok = new WhitespaceTokenizer();
+        Tokenizer tok = new PinyinSyllableTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
-        assertTokenStream(pinyin, expected);
+        assertTokenStream(words, expected);
     }
     
     @Test
@@ -282,13 +280,11 @@ public class ChineseComponentsTests  {
         String input = "cháng'ān chāo'é dān'ǒuhūn tiān'ānmén é'ér dìèr ŌuĀnhuì";
         Reader reader = new StringReader(input);
         List<String> expected = Arrays.asList("cháng", "ān", "chāo", "é", "dān", "ǒu", 
-                "hūn", "tiān", "ān", "mén", "é", "ér", "dì", "èr", "Ōu", "Ān", "huì");
+                "hūn", "tiān", "ān", "mén", "é", "ér", "dì", "èr", "ōu", "ān", "huì");
         System.out.println("0 " + input);
-        Tokenizer tok = new WhitespaceTokenizer();
+        Tokenizer tok = new PinyinSyllableTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
-        assertTokenStream(pinyin, expected);
-        reader.close();
+        assertTokenStream(words, expected);
     }
     
     @Test
@@ -298,10 +294,9 @@ public class ChineseComponentsTests  {
         Reader reader = new StringReader(input);
         List<String> expected = Arrays.asList("biao", "i", "er");
         System.out.println("0 " + input);
-        Tokenizer tok = new WhitespaceTokenizer();
+        Tokenizer tok = new PinyinSyllableTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
-        assertTokenStream(pinyin, expected);
+        assertTokenStream(words, expected);
     }
 
     @Test
@@ -312,10 +307,9 @@ public class ChineseComponentsTests  {
         Reader reader = new StringReader(input);
         List<String> expected = Arrays.asList("wo", "de", "mao", "xi", "huan", "he", "niu", "nai");
         System.out.println("0 " + input);
-        Tokenizer tok = new WhitespaceTokenizer();
+        Tokenizer tok = new PinyinSyllableTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
-        assertTokenStream(pinyin, expected);
+        assertTokenStream(words, expected);
     }
     
     @Test
@@ -326,10 +320,9 @@ public class ChineseComponentsTests  {
         Reader reader = new StringReader(input);
         List<String> expected = Arrays.asList("dé", "rě", "wǒ", "fèn", "dòu", "dǒu", "wǒ", "rèn", "wèi");
         System.out.println("0 " + input);
-        Tokenizer tok = new WhitespaceTokenizer();
+        Tokenizer tok = new PinyinSyllableTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
-        assertTokenStream(pinyin, expected);
+        assertTokenStream(words, expected);
     }
     
     @Test
@@ -350,14 +343,60 @@ public class ChineseComponentsTests  {
     @Test
     public void bugSyllabifier1() throws IOException
     {
-        // from https://github.com/pepebecker/pinyin-split/blob/master/test/index.js
         String input = "heniu";
         Reader reader = new StringReader(input);
         List<String> expected = Arrays.asList("he", "niu");
         System.out.println("0 " + input);
-        Tokenizer tok = new WhitespaceTokenizer();
+        Tokenizer tok = new PinyinSyllableTokenizer();
         TokenStream words = tokenize(reader, tok);
-        TokenStream pinyin = new PinyinSyllabifyingFilter(words);
-        assertTokenStream(pinyin, expected);
+        assertTokenStream(words, expected);
+    }
+    
+    @Test
+    public void bugSyllabifier2() throws IOException
+    {
+        String input = "rěwǒ";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("rě", "wǒ");
+        System.out.println("0 " + input);
+        Tokenizer tok = new PinyinSyllableTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        assertTokenStream(words, expected);
+    }
+    
+    @Test
+    public void bugSyllabifier3() throws IOException
+    {
+        String input = "lángān";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("lán", "gān");
+        System.out.println("0 " + input);
+        Tokenizer tok = new PinyinSyllableTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        assertTokenStream(words, expected);
+    }
+    
+    @Test
+    public void bugSyllabifier4() throws IOException
+    {
+        String input = "dòngwù";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("dòng", "wù");
+        System.out.println("0 " + input);
+        Tokenizer tok = new PinyinSyllableTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        assertTokenStream(words, expected);
+    }
+    
+    @Test
+    public void bugSyllabifier5() throws IOException
+    {
+        String input = "tāngrshì";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("tāng", "r", "shì");
+        System.out.println("0 " + input);
+        Tokenizer tok = new PinyinSyllableTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        assertTokenStream(words, expected);
     }
 }

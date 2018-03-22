@@ -40,7 +40,7 @@ import io.bdrc.lucene.stemmer.Trie;
  *      "changan" yields "chan", "gan"
  *      "chang'an" and "chang-an" yield "chang", "an"
  * 
- * Note: As explained {@link http://www.thefullwiki.org/Erhua}, the erhua phenomenon pertains to the
+ * Note: As explained {@link https://en.wikipedia.org/wiki/Erhua}, the erhua phenomenon pertains to the
  *      spoken Mandarin dialect and to some Northern dialects. As such, we don's support it since
  *      we aim to index literary Chinese. "tangr" yields "tang", "r"
  * 
@@ -147,6 +147,9 @@ public class PinyinSyllableTokenizer extends Tokenizer{
 
     @Override
     public final boolean incrementToken() throws IOException {
+        boolean debug = true;
+        if (debug) {System.out.println("----------");}
+        
         clearAttributes();
         ioBuffer.freeBefore(bufferIndex);
         
@@ -158,9 +161,10 @@ public class PinyinSyllableTokenizer extends Tokenizer{
         tokenEnd = -1;
         tokenLength = 0;
         
-        boolean hasMatched = false;
         boolean match = false;
         boolean continuing = false;
+        boolean hasMatched = false;
+        int longestMatchIdx = -1;
         
         while (true) {
             final int c = normalize(ioBuffer.get(bufferIndex));    // take next char in ioBuffer and normalize it
@@ -174,7 +178,6 @@ public class PinyinSyllableTokenizer extends Tokenizer{
                 }
                 break;
             }
-            boolean debug = true;
             if (debug) {System.out.println("\t" + (char) c);}
             
             if (isTokenChar(c)) {               // if it's a token char
@@ -184,7 +187,7 @@ public class PinyinSyllableTokenizer extends Tokenizer{
                     match = tryToFindMatchIn(rootRow, c);
                     continuing = tryToContinueDownTheTrie(rootRow, c);
                     
-                } else {
+                } else if (continuing){
                     match = tryToFindMatchIn(currentRow, c);
                     continuing = tryToContinueDownTheTrie(currentRow, c);                    
                 }
@@ -193,31 +196,50 @@ public class PinyinSyllableTokenizer extends Tokenizer{
                     hasMatched = true;
                 }
                 
+                /* reached the longest match */
+                if (longestMatchIdx == -1 && hasMatched && !continuing) {
+                    longestMatchIdx = bufferIndex;
+                }
+                
                 tokenEnd = bufferIndex;  // has to be incremented before breaking
                 
-                /* reached a non-syllable char */
-                if (!match && !continuing){
-                    /* if current char is a vowel and previous letter is 'g' or 'n' */
+                /* reached the end of the longest syllable or a non-syllable */
+                if (!continuing){
                     int lastCharIdx = (tokenLength - 1 < 0) ? 0: tokenLength - 1;
-                    if (pinyinVowels.contains((char) c) && (termAtt.length() > 0 && (tokenBuffer[lastCharIdx] == 'g' 
-                            || tokenBuffer[lastCharIdx] == 'n'))) {
+                    
+                    /* current char does not belong to the current syllable
+                     * (current char is a vowel and previous letter is 'g' or 'n') */
+                    if ((pinyinVowels.contains((char) c) || unihanPinyinDiacritics.contains((char) c)) 
+                            && (termAtt.length() > 0 && 
+                                    (tokenBuffer[lastCharIdx] == 'g' || tokenBuffer[lastCharIdx] == 'n'))) {
                         tokenLength --;
                         bufferIndex -= 2;
                         break;
                     
-                        /* there is a match or a non-match */
-                    } else {
-                        if (hasMatched) {
-                            bufferIndex -= 1;
-                            break;
-                        } else {
-                            IncrementTokenLengthAndAddCurrentCharTo(tokenBuffer, c);
-                            typeAtt.setType("non-word");
-                            break;
+                    /* there is a match or a non-match */
+                    } else {                        
+                        if (!match) {
+                            if (hasMatched || tokenLength >= 1) {
+                                bufferIndex --;
+                                break;
+                            } else {
+                                IncrementTokenLengthAndAddCurrentCharTo(tokenBuffer, c);
+                                break;
+                            }
+                        } else if (bufferIndex >= longestMatchIdx) {
+                            if (pinyinVowels.contains((char) c) || unihanPinyinDiacritics.contains((char) c)) { 
+                                IncrementTokenLengthAndAddCurrentCharTo(tokenBuffer, c);
+                                break;
+                            } else if (bufferIndex > longestMatchIdx) {
+                                bufferIndex --;
+                                break;
+                            }
                         }
 
                     }
                 }
+                
+                /* still building the current syllable */
                 IncrementTokenLengthAndAddCurrentCharTo(tokenBuffer, c);
                 
                 if (tokenLength >= MAX_WORD_LEN) { // buffer overflow! make sure to check for >= surrogate pair could break == test
@@ -231,6 +253,8 @@ public class PinyinSyllableTokenizer extends Tokenizer{
         termAtt.setLength(tokenLength);
         assert tokenStart != -1;
         offsetAtt.setOffset(correctOffset(tokenStart), correctOffset(tokenEnd));
+        if (!hasMatched)
+            typeAtt.setType("non-word");
         return true;
     }
     
@@ -241,7 +265,8 @@ public class PinyinSyllableTokenizer extends Tokenizer{
     }
     
     private boolean tryToFindMatchIn(Row row, int c) {
-        return (row.getCmd((char) c) >= 0);
+        int cmdIndex = row.getCmd((char) c);
+        return cmdIndex >= 0;
     }
     
     private void IncrementTokenLengthAndAddCurrentCharTo(char[] tokenBuffer, int c) {
