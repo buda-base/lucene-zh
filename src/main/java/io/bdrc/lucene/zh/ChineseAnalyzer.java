@@ -27,7 +27,6 @@ import java.security.InvalidParameterException;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 
 /**
@@ -212,14 +211,18 @@ public final class ChineseAnalyzer extends Analyzer {
     @Override
     protected TokenStreamComponents createComponents(final String fieldName) {        
         /* tokenizes in ideograms or in words separated by punctuation.*/
-        Tokenizer tok;
+        Tokenizer tok = null;
+        TokenStream tokenStream = null;
+        
         if (this.inputEncoding.startsWith("PY")) {
-            tok = new WhitespaceTokenizer();
+            try {
+                tok = new PinyinSyllableTokenizer();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             tok = new StandardTokenizer();
         }
-        
-        TokenStream tokenStream = null;
         
         /* if (input is either TC or SC) */
         if (this.inputEncoding.endsWith("C")) {
@@ -280,9 +283,10 @@ public final class ChineseAnalyzer extends Analyzer {
         
         /* indexing from any encoding to PYlazy */
         if (this.inputEncoding.startsWith("PY")) {
-            tokenStream = new PinyinSyllabifyingFilter(tok);
             if (this.indexEncoding.equals("PYlazy") && !this.inputEncoding.equals("PYlazy")) {
-                tokenStream = new LazyPinyinFilter(tokenStream);    
+                tokenStream = new LazyPinyinFilter(tok);    
+            } else {
+                return new TokenStreamComponents(tok);
             }
         }
         return new TokenStreamComponents(tok, tokenStream);
