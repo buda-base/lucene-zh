@@ -192,7 +192,7 @@ public class ChineseAnalyzerTests {
         // r3 is a non-word. it will be tokenized into 'r' + '3'. numbers in non-valid syllables are left intact.
         String input = "Rú sHì Wǒ wéN. +@/* r3 yi0 yi5 miao1 fei1 zhou3 huo3 lün1 lvn2 yi1 wan4 nian2 jing1";
         List<String> expected = Arrays.asList("ru", "shi", "wo", "wen", "r", "3", "yi", "yi", "miao", "fei", 
-                "zhou", "huo", "lün", "lvn", "yi", "wan", "nian", "jing");
+                "zhou", "huo", "lun", "lun", "yi", "wan", "nian", "jing");
         Analyzer ca = new ChineseAnalyzer("PYstrictToPYlazy");
         List<String> tokens = parseTokens(ca, input);
         System.out.println("1 " + expected.toString());

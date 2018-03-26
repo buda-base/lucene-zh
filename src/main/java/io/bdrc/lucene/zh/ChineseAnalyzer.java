@@ -280,7 +280,7 @@ public final class ChineseAnalyzer extends Analyzer {
         
         /* indexing from any encoding to PYlazy */
         if (this.inputEncoding.startsWith("PY")) {
-            if (this.inputEncoding.equals("PYstrict")) {
+            if (this.inputEncoding.equals("PYstrict") && this.indexEncoding.equals("PYstrict")) {
                 try {
                     tokenStream = new PinyinNumberedToMarkedFilter(tok);
                 } catch (IOException e) {
