@@ -87,11 +87,9 @@ public class PinyinSyllableTokenizer extends Tokenizer{
             'Ū', 'Ú', 'Ǔ', 'Ù', 
             'ū', 'ú', 'ǔ', 'ù', 
             'Ǖ', 'Ǘ', 'Ǚ', 'Ǜ', 'Ü',
-            'ǖ', 'ǘ', 'ǚ', 'ǜ', 'ü', 
-            // numbers for numbered Pinyin
-            '0', '1', '2', '3', '4', '5');
-    private List <Character> pinyinVowels = Arrays.asList(
-            'a', 'e', 'i', 'o', 'u', 'v', 'ü');
+            'ǖ', 'ǘ', 'ǚ', 'ǜ', 'ü');
+    private List <Character> pinyinVowels = Arrays.asList('a', 'e', 'i', 'o', 'u', 'v', 'ü');
+    private List<Character> pinyinNumbers = Arrays.asList('0', '1', '2', '3', '4', '5');
     private StringCharacterIterator nonwordIterator = null;
     private int nonwordOffset = -1;
     
@@ -141,7 +139,8 @@ public class PinyinSyllableTokenizer extends Tokenizer{
     protected boolean isTokenChar(int c) {
         return (c > 96 && c < 123) || (c > 64 && c < 91) 
                 || unihanPinyinDiacritics.contains((char) c)
-                || pinyinVowels.contains((char) c);
+                || pinyinVowels.contains((char) c)
+                || pinyinNumbers.contains((char) c);
     }
 
     /**

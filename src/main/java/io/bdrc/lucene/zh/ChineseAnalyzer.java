@@ -65,9 +65,9 @@ public final class ChineseAnalyzer extends Analyzer {
             this.inputEncoding = "TC";
             this.indexEncoding = "SC";
         
-        } else if (profile.equals("TC2PYmarked")) {
+        } else if (profile.equals("TC2PYstrict")) {
             this.inputEncoding = "TC";
-            this.indexEncoding = "PYmarked";
+            this.indexEncoding = "PYstrict";
         
         } else if (profile.equals("TC2PYlazy")) {
             this.inputEncoding = "TC";
@@ -77,38 +77,22 @@ public final class ChineseAnalyzer extends Analyzer {
             this.inputEncoding = "SC";
             this.indexEncoding = "SC";
         
-        } else if (profile.equals("SC2PYmarked")) {
+        } else if (profile.equals("SC2PYstrict")) {
             this.inputEncoding = "SC";
-            this.indexEncoding = "PYmarked";
+            this.indexEncoding = "PYstrict";
         
         } else if (profile.equals("SC2PYlazy")) {
             this.inputEncoding = "SC";
             this.indexEncoding = "PYlazy";
         
-        } else if (profile.equals("PYmarked")) {
-            this.inputEncoding = "PYmarked";
-            this.indexEncoding = "PYmarked";
-        
-        } else if (profile.equals("PYmarkedToPYnumbered")) {
-            this.inputEncoding = "PYmarked";
-            this.indexEncoding = "PYnumbered";
-        
-        } else if (profile.equals("PYmarkedToPYlazy")) {
-            this.inputEncoding = "PYmarked";
+        } else if (profile.equals("PYstrict")) {
+            this.inputEncoding = "PYstrict";
+            this.indexEncoding = "PYstrict";
+
+        } else if (profile.equals("PYstrictToPYlazy")) {
+            this.inputEncoding = "PYstrict";
             this.indexEncoding = "PYlazy";
-        
-        } else if (profile.equals("PYnumbered")) {
-            this.inputEncoding = "PYnumbered";
-            this.indexEncoding = "PYnumbered";
-        
-        } else if (profile.equals("PYnumberedToPYmarked")) {
-            this.inputEncoding = "PYnumbered";
-            this.indexEncoding = "PYmarked";
-        
-        } else if (profile.equals("PYnumberedToPYlazy")) {
-            this.inputEncoding = "PYnumbered";
-            this.indexEncoding = "PYlazy";
-        
+
         } else if (profile.equals("PYlazy")) {
             this.inputEncoding = "PYlazy";
             this.indexEncoding = "PYlazy";
@@ -154,9 +138,9 @@ public final class ChineseAnalyzer extends Analyzer {
             this.variants = variants;
             this.stopwords = stopwords;
         
-        } else if (profile.equals("TC2PYmarked")) {
+        } else if (profile.equals("TC2PYstrict")) {
             this.inputEncoding = "TC";
-            this.indexEncoding = "PYmarked";
+            this.indexEncoding = "PYstrict";
             this.variants = variants;
             this.stopwords = stopwords;
         
@@ -172,9 +156,9 @@ public final class ChineseAnalyzer extends Analyzer {
             this.variants = variants;
             this.stopwords = stopwords;
         
-        } else if (profile.equals("SC2PYmarked")) {
+        } else if (profile.equals("SC2PYstrict")) {
             this.inputEncoding = "SC";
-            this.indexEncoding = "PYmarked";
+            this.indexEncoding = "PYstrict";
             this.variants = variants;
             this.stopwords = stopwords;
         
@@ -184,30 +168,14 @@ public final class ChineseAnalyzer extends Analyzer {
             this.variants = variants;
             this.stopwords = stopwords;
         
-        } else if (profile.equals("PYmarked")) {
-            this.inputEncoding = "PYmarked";
-            this.indexEncoding = "PYmarked";
-        
-        } else if (profile.equals("PYmarkedToPYnumbered")) {
-            this.inputEncoding = "PYmarked";
-            this.indexEncoding = "PYnumbered";
-        
-        } else if (profile.equals("PYmarkedToPYlazy")) {
-            this.inputEncoding = "PYmarked";
+        } else if (profile.equals("PYstrict")) {
+            this.inputEncoding = "PYstrict";
+            this.indexEncoding = "PYstrict";
+
+        } else if (profile.equals("PYstrictToPYlazy")) {
+            this.inputEncoding = "PYstrict";
             this.indexEncoding = "PYlazy";
-        
-        } else if (profile.equals("PYnumbered")) {
-            this.inputEncoding = "PYnumbered";
-            this.indexEncoding = "PYnumbered";
-        
-        } else if (profile.equals("PYnumberedToPYmarked")) {
-            this.inputEncoding = "PYnumbered";
-            this.indexEncoding = "PYmarked";
-        
-        } else if (profile.equals("PYnumberedToPYlazy")) {
-            this.inputEncoding = "PYnumbered";
-            this.indexEncoding = "PYlazy";
-        
+
         } else if (profile.equals("PYlazy")) {
             this.inputEncoding = "PYlazy";
             this.indexEncoding = "PYlazy";
@@ -311,9 +279,15 @@ public final class ChineseAnalyzer extends Analyzer {
         }
         
         /* indexing from any encoding to PYlazy */
-        if (this.inputEncoding.startsWith("PY")) {            
-            if (this.indexEncoding.equals("PYlazy") && !this.inputEncoding.equals("PYlazy")) {
-                if (this.inputEncoding.equals("PYnumbered")) {
+        if (this.inputEncoding.startsWith("PY")) {
+            if (this.inputEncoding.equals("PYstrict")) {
+                try {
+                    tokenStream = new PinyinNumberedToMarkedFilter(tok);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (this.indexEncoding.equals("PYlazy") && !this.inputEncoding.equals("PYlazy")) {
+                if (this.inputEncoding.equals("PYstrict")) {
                     try {
                         tokenStream = new PinyinNumberedToMarkedFilter(tok);
                     } catch (IOException e) {

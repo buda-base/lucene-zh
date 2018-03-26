@@ -91,7 +91,7 @@ public class ChineseAnalyzerTests {
         List<String> expected = Arrays.asList("wén", "shí", "fó", "luō", "yuè", "qí", "qí", 
                 "dū", "jué", "shān", "yǔ", "qiū", "zhòng", "qiān", "bǎi", "shí", "pú", "sà", 
                 "qiān", "jù");
-        Analyzer ca = new ChineseAnalyzer("TC2PYnumbered");
+        Analyzer ca = new ChineseAnalyzer("TC2PYstrict");
         List<String> tokens = parseTokens(ca, input);
         System.out.println("1 " + expected.toString());
         System.out.println("2 " + tokens.toString());
@@ -142,7 +142,7 @@ public class ChineseAnalyzerTests {
                 "zai", "luo", "yue", "qi", "qi", "du", "jue", "shan", "zhong", "yu", "da", 
                 "bi", "qiu", "zhong", "qian", "er", "bai", "wu", "shi", "ren", "pu", "sa", 
                 "wu", "qian", "ren", "ju");
-        Analyzer ca = new ChineseAnalyzer("PYmarkedToPYlazy");
+        Analyzer ca = new ChineseAnalyzer("PYstrictToPYlazy");
         List<String> tokens = parseTokens(ca, input);
         System.out.println("1 " + expected.toString());
         System.out.println("2 " + tokens.toString());
@@ -153,13 +153,15 @@ public class ChineseAnalyzerTests {
     @Test
     public void testPYmarked() throws IOException
     {
+        // strictly speaking, capitals are not allowed in Pinyin except at initials of words
+        // we tolerate them.
         String input = "Rú sHì Wǒ wéN. Yī shí fú zài luó yuè qí qí dū jué shān zhōng. "
                 + "Yǔ dà bǐ qiū zhòng qiān èr bǎi wǔ shí rén pú sà wǔ qiān rén jù.";
         List<String> expected = Arrays.asList("rú", "shì", "wǒ", "wén", "yī", "shí", "fú", 
                 "zài", "luó", "yuè", "qí", "qí", "dū", "jué", "shān", "zhōng", "yǔ", "dà", 
                 "bǐ", "qiū", "zhòng", "qiān", "èr", "bǎi", "wǔ", "shí", "rén", "pú", "sà", 
                 "wǔ", "qiān", "rén", "jù");
-        Analyzer ca = new ChineseAnalyzer("PYmarked");
+        Analyzer ca = new ChineseAnalyzer("PYstrict");
         List<String> tokens = parseTokens(ca, input);
         System.out.println("1 " + expected.toString());
         System.out.println("2 " + tokens.toString());
@@ -185,15 +187,27 @@ public class ChineseAnalyzerTests {
     }
     
     @Test
-    public void testPYnumberedToMarked() throws IOException
+    public void testPYstrictToPYlazy() throws IOException
     {
-        String input = "+@/* r3 yi0 yi5 miao1 fei1 zhou3 huo3 lün1 lvn2 yi1 wan4 nian2 jing1 a1 a2 a3 a4 e1 e2 e3 e4 i1 i2 i3 i4 "
-                + "o1 o2 o3 o4 u1 u2 u3 u4 v1 v2 v3 v4";
-        List<String> expected = Arrays.asList("ru", "shi", "wo", "wen", "yi", "shi", "fu", 
-                "zai", "luo", "yue", "qi", "qi", "du", "jue", "shan", "zhong", "yu", "da", 
-                "bi", "qiu", "zhong", "qian", "er", "bai", "wu", "shi", "ren", "pu", "sa", 
-                "wu", "qian", "ren", "ju");
-        Analyzer ca = new ChineseAnalyzer("PYmarkedToPYlazy");
+        // r3 is a non-word. it will be tokenized into 'r' + '3'. numbers in non-valid syllables are left intact.
+        String input = "Rú sHì Wǒ wéN. +@/* r3 yi0 yi5 miao1 fei1 zhou3 huo3 lün1 lvn2 yi1 wan4 nian2 jing1";
+        List<String> expected = Arrays.asList("ru", "shi", "wo", "wen", "r", "3", "yi", "yi", "miao", "fei", 
+                "zhou", "huo", "lün", "lvn", "yi", "wan", "nian", "jing");
+        Analyzer ca = new ChineseAnalyzer("PYstrictToPYlazy");
+        List<String> tokens = parseTokens(ca, input);
+        System.out.println("1 " + expected.toString());
+        System.out.println("2 " + tokens.toString());
+        System.out.println();
+        assertEquals(expected, tokens);
+    }
+    
+    @Test
+    public void testPYstrict() throws IOException
+    {
+        // r3 is a non-word. it will be tokenized into 'r' + '3'. numbers in non-valid syllables are left intact.
+        String input = "Rú sHì Wǒ wéN yi0 yi5 miao1";
+        List<String> expected = Arrays.asList("rú", "shì", "wǒ", "wén", "yi", "yi", "miāo");
+        Analyzer ca = new ChineseAnalyzer("PYstrict");
         List<String> tokens = parseTokens(ca, input);
         System.out.println("1 " + expected.toString());
         System.out.println("2 " + tokens.toString());

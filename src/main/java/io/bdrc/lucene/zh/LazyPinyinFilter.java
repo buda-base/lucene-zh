@@ -20,11 +20,14 @@
 package io.bdrc.lucene.zh;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
 /**
  * Pinyin -> Lazy Pinyin charfilter
@@ -39,6 +42,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 public class LazyPinyinFilter extends TokenFilter {
 
     private HashMap<String, String> map;
+    private List<Character> pinyinNumbers = Arrays.asList('0', '1', '2', '3', '4', '5');
 
     public LazyPinyinFilter(TokenStream in) {
         super(in);
@@ -82,6 +86,7 @@ public class LazyPinyinFilter extends TokenFilter {
     }
 
     CharTermAttribute charTermAttribute = addAttribute(CharTermAttribute.class);
+    TypeAttribute typeAttribute = addAttribute(TypeAttribute.class);
 
     @Override
     public final boolean incrementToken() throws IOException {
@@ -95,6 +100,9 @@ public class LazyPinyinFilter extends TokenFilter {
                 } else {
                     lazied.append(t);
                 }
+            }
+            if (typeAttribute.type().equals("word") && pinyinNumbers.contains(lazied.charAt(lazied.length() - 1))) {
+                lazied.setLength(lazied.length() - 1);
             }
             charTermAttribute.setEmpty().append(lazied.toString());
             return true;
