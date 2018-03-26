@@ -27,8 +27,8 @@ import io.bdrc.lucene.stemmer.Trie;
  * 
  * Segmenting algorithm:
  *      
- *      Implements the algorithm presented {@link https://github.com/tsroten/zhon/blob/develop/zhon/pinyin.py#L64}:
- *      1. get the longest valid syllable (in the 421 syllables from {@link https://en.wikipedia.org/wiki/Pinyin_table#Overall_table} 
+ *      Implements the algorithm presented @see <a href="https://github.com/tsroten/zhon/blob/develop/zhon/pinyin.py#L64">here</a>:
+ *      1. get the longest valid syllable (in the 421 syllables from @see <a href="https://en.wikipedia.org/wiki/Pinyin_table#Overall_table">Pinyin Table</a> 
  *      2. If it ends in a consonant make sure it's not followed directly by a
  *         vowel (hyphens and apostrophes don't count).
  *      3. If the above didn't match, repeat for the next longest valid match.
@@ -42,7 +42,7 @@ import io.bdrc.lucene.stemmer.Trie;
  *      "changan" yields "chan", "gan"
  *      "chang'an" and "chang-an" yield "chang", "an"
  * 
- * Note: As explained {@link https://en.wikipedia.org/wiki/Erhua}, the erhua phenomenon pertains to the
+ * Note: As explained in @see <a href="https://en.wikipedia.org/wiki/Erhua">this article</a>, the erhua phenomenon pertains to the
  *      spoken Mandarin dialect and to some Northern dialects. As such, we don's support it since
  *      we aim to index literary Chinese. "tangr" yields "tang", "r"
  * 
@@ -135,6 +135,9 @@ public class PinyinSyllableTokenizer extends Tokenizer{
      * generates as tokens adjacent sequences of codepoints which satisfy this
      * predicate. Codepoints for which this is false are used to define token
      * boundaries and are not included in tokens.
+     * 
+     * @param c the current character
+     * @return true iff c is a valid Pinyin character.
      */
     protected boolean isTokenChar(int c) {
         return (c > 96 && c < 123) || (c > 64 && c < 91) 
@@ -145,6 +148,9 @@ public class PinyinSyllableTokenizer extends Tokenizer{
 
     /**
      * Lowercases all the token chars (filtering non-Pinyin accents is done by PinyinNormalizingFilter)
+     * 
+     * @param c the codepoint to normalize (current char)
+     * @return the lower-cased codepoint
      */
     protected int normalize(int c) {
         return Character.toLowerCase(c);

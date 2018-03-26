@@ -36,7 +36,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
  * The first variant occuring in Unihan is arbitrarily chosen.
  * 
  * uses data from
- * {@link https://github.com/BuddhistDigitalResourceCenter/lucene-zh-data}
+ * @see <a href="https://github.com/BuddhistDigitalResourceCenter/lucene-zh-data">lucene-zh-data</a>
  * 
  * @author Hélios Hildt
  *

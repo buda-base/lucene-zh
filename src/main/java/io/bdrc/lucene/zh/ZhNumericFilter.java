@@ -33,9 +33,9 @@ import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
  * !!! IMPORTANT
  * As the data from zh-numbers.tsv is not comprehensive enough to correctly parse all numerals 
  * to their arabic counterparts, this Filter is not used in ChineseAnalyzer 
- * (See {@link http://www.mandarintools.com/numbers.html})
+ * (See @see <a href="http://www.mandarintools.com/numbers.html">here</a>)
  * 
- * {@link https://en.wikibooks.org/wiki/Chinese_(Mandarin)/Numbers} also shows that these numeral
+ * @see <a href="https://en.wikibooks.org/wiki/Chinese_(Mandarin)/Numbers">This</a> article also shows that these numeral
  * ideograms have different meanings, like: '貳(2) can also mean "to betray"'. 
  * !!!
  * 
@@ -44,7 +44,7 @@ import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
  * For ex: "一", "壱", "壹" and "弌"  all map to "1"
  * 
  * Note: ZhOnlyFilter deletes the arabic numbers coming out of ZhNumericFilter.
- * uses data from {@link https://github.com/BuddhistDigitalResourceCenter/lucene-zh-data}
+ * @see <a href="https://github.com/BuddhistDigitalResourceCenter/lucene-zh-data">lucene-zh-data</a>
  * 
  * @author Hélios Hildt
  *

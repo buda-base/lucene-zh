@@ -32,7 +32,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 /**
  * Token Filter to convert a Pinyin syllable with tone numbers to tone marks
  * 
- *  Implements the following algorithm(from {@link https://github.com/tsroten/zhon/blob/develop/tests/test-pinyin.py#L99}:
+ *  Implements the following algorithm(from @see <a href="https://github.com/tsroten/zhon/blob/develop/tests/test-pinyin.py#L99">zhon</a>:
  *
  *     1. If the syllable has an 'a' or 'e', put the tone over that vowel.
  *     2. If the syllable has 'ou', place the tone over the 'o'.
@@ -55,7 +55,8 @@ public class PinyinNumberedToMarkedFilter extends TokenFilter {
      * Converts a Pinyin syllable with tone numbers to tone marks
      *  
      * @param pinyinStr syllable to process 
-     * @return
+     * @return the marked syllable if it ended with a pinyin number and if it contains a vowel
+     *          else returns the syllable as-is.
      */
     public static String numberedToMarked(String pinyinStr) {
         List<Character> toneNumbers = Arrays.asList('1', '2', '3', '4', '5', '0');

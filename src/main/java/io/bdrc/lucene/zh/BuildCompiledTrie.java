@@ -100,6 +100,8 @@ public class BuildCompiledTrie {
      * 
      * @param trie  the trie to store in binary format
      * @param outFilename  the path+filename of the output file
+     * @throws FileNotFoundException file for storing the trie not found 
+     * @throws IOException could not write to file
      */
     public static void storeTrie(Trie trie, String outFilename) throws FileNotFoundException, IOException {
         OutputStream output = new DataOutputStream(new FileOutputStream(outFilename));

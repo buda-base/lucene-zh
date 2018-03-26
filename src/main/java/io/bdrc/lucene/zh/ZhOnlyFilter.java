@@ -27,8 +27,8 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
 /**
- * Filters all tokens whose type is not "<IDEOGRAPHIC>" or "<CJ>",
- * the types produced by {@link StandardFilter} for Chinese tokens.
+ * Filters all tokens whose type is not "IDEOGRAPHIC" or "CJ",
+ * the types produced by {@link org#apache#lucene#analysis#standard#StandardTokenizer} for Chinese tokens.
  * 
  * @author Hélios Hildt
  */

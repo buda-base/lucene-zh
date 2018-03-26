@@ -30,9 +30,9 @@ import org.apache.lucene.analysis.charfilter.MappingCharFilter;
 import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
 
 /**
- * Traditional Chinese -> Simplified Chinese charfilter 
+ * Traditional Chinese to Simplified Chinese charfilter 
  * 
- * uses data from {@link https://github.com/BuddhistDigitalResourceCenter/lucene-zh-data}
+ * @see <a href="https://github.com/BuddhistDigitalResourceCenter/lucene-zh-data">lucene-zh-data</a>
  * 
  * @author Hélios Hildt
  *
