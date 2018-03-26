@@ -65,9 +65,9 @@ public final class ChineseAnalyzer extends Analyzer {
             this.inputEncoding = "TC";
             this.indexEncoding = "SC";
         
-        } else if (profile.equals("TC2PYstrict")) {
+        } else if (profile.equals("TC2PYmarked")) {
             this.inputEncoding = "TC";
-            this.indexEncoding = "PYstrict";
+            this.indexEncoding = "PYmarked";
         
         } else if (profile.equals("TC2PYlazy")) {
             this.inputEncoding = "TC";
@@ -77,26 +77,42 @@ public final class ChineseAnalyzer extends Analyzer {
             this.inputEncoding = "SC";
             this.indexEncoding = "SC";
         
-        } else if (profile.equals("SC2PYstrict")) {
+        } else if (profile.equals("SC2PYmarked")) {
             this.inputEncoding = "SC";
-            this.indexEncoding = "PYstrict";
+            this.indexEncoding = "PYmarked";
         
         } else if (profile.equals("SC2PYlazy")) {
             this.inputEncoding = "SC";
             this.indexEncoding = "PYlazy";
         
-        } else if (profile.equals("PYstrict")) {
-            this.inputEncoding = "PYstrict";
-            this.indexEncoding = "PYstrict";
+        } else if (profile.equals("PYmarked")) {
+            this.inputEncoding = "PYmarked";
+            this.indexEncoding = "PYmarked";
         
-        } else if (profile.equals("PYstrict2PYlazy")) {
-            this.inputEncoding = "PYstrict";
+        } else if (profile.equals("PYmarkedToPYnumbered")) {
+            this.inputEncoding = "PYmarked";
+            this.indexEncoding = "PYnumbered";
+        
+        } else if (profile.equals("PYmarkedToPYlazy")) {
+            this.inputEncoding = "PYmarked";
+            this.indexEncoding = "PYlazy";
+        
+        } else if (profile.equals("PYnumbered")) {
+            this.inputEncoding = "PYnumbered";
+            this.indexEncoding = "PYnumbered";
+        
+        } else if (profile.equals("PYnumberedToPYmarked")) {
+            this.inputEncoding = "PYnumbered";
+            this.indexEncoding = "PYmarked";
+        
+        } else if (profile.equals("PYnumberedToPYlazy")) {
+            this.inputEncoding = "PYnumbered";
             this.indexEncoding = "PYlazy";
         
         } else if (profile.equals("PYlazy")) {
             this.inputEncoding = "PYlazy";
             this.indexEncoding = "PYlazy";
-            
+        
         } else {
             throw new InvalidParameterException(profile+" is not a supported profile");
         }
@@ -138,9 +154,9 @@ public final class ChineseAnalyzer extends Analyzer {
             this.variants = variants;
             this.stopwords = stopwords;
         
-        } else if (profile.equals("TC2PYstrict")) {
+        } else if (profile.equals("TC2PYmarked")) {
             this.inputEncoding = "TC";
-            this.indexEncoding = "PYstrict";
+            this.indexEncoding = "PYmarked";
             this.variants = variants;
             this.stopwords = stopwords;
         
@@ -156,9 +172,9 @@ public final class ChineseAnalyzer extends Analyzer {
             this.variants = variants;
             this.stopwords = stopwords;
         
-        } else if (profile.equals("SC2PYstrict")) {
+        } else if (profile.equals("SC2PYmarked")) {
             this.inputEncoding = "SC";
-            this.indexEncoding = "PYstrict";
+            this.indexEncoding = "PYmarked";
             this.variants = variants;
             this.stopwords = stopwords;
         
@@ -168,20 +184,33 @@ public final class ChineseAnalyzer extends Analyzer {
             this.variants = variants;
             this.stopwords = stopwords;
         
-        } else if (profile.equals("PYstrict")) {
-            this.inputEncoding = "PYstrict";
-            this.indexEncoding = "PYstrict";
-            this.stopwords = true;
+        } else if (profile.equals("PYmarked")) {
+            this.inputEncoding = "PYmarked";
+            this.indexEncoding = "PYmarked";
         
-        } else if (profile.equals("PYstrict2PYlazy")) {
-            this.inputEncoding = "PYstrict";
+        } else if (profile.equals("PYmarkedToPYnumbered")) {
+            this.inputEncoding = "PYmarked";
+            this.indexEncoding = "PYnumbered";
+        
+        } else if (profile.equals("PYmarkedToPYlazy")) {
+            this.inputEncoding = "PYmarked";
             this.indexEncoding = "PYlazy";
-            this.stopwords = true;
+        
+        } else if (profile.equals("PYnumbered")) {
+            this.inputEncoding = "PYnumbered";
+            this.indexEncoding = "PYnumbered";
+        
+        } else if (profile.equals("PYnumberedToPYmarked")) {
+            this.inputEncoding = "PYnumbered";
+            this.indexEncoding = "PYmarked";
+        
+        } else if (profile.equals("PYnumberedToPYlazy")) {
+            this.inputEncoding = "PYnumbered";
+            this.indexEncoding = "PYlazy";
         
         } else if (profile.equals("PYlazy")) {
             this.inputEncoding = "PYlazy";
             this.indexEncoding = "PYlazy";
-            this.stopwords = true;
         
         } else {
             throw new InvalidParameterException(profile+" is not a supported profile");
@@ -282,9 +311,18 @@ public final class ChineseAnalyzer extends Analyzer {
         }
         
         /* indexing from any encoding to PYlazy */
-        if (this.inputEncoding.startsWith("PY")) {
+        if (this.inputEncoding.startsWith("PY")) {            
             if (this.indexEncoding.equals("PYlazy") && !this.inputEncoding.equals("PYlazy")) {
-                tokenStream = new LazyPinyinFilter(tok);    
+                if (this.inputEncoding.equals("PYnumbered")) {
+                    try {
+                        tokenStream = new PinyinNumberedToMarkedFilter(tok);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    tokenStream = new LazyPinyinFilter(tokenStream);
+                } else {
+                    tokenStream = new LazyPinyinFilter(tok);
+                }
             } else {
                 return new TokenStreamComponents(tok);
             }

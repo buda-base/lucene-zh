@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.Arrays;
 import java.util.List;
 
@@ -84,12 +86,14 @@ public class PinyinSyllableTokenizer extends Tokenizer{
             'ō', 'ó', 'ǒ', 'ò', 
             'Ū', 'Ú', 'Ǔ', 'Ù', 
             'ū', 'ú', 'ǔ', 'ù', 
-            'Ǖ', 'Ǘ', 'Ǚ', 'Ǜ',
-            'ǖ', 'ǘ', 'ǚ', 'ǜ', 
+            'Ǖ', 'Ǘ', 'Ǚ', 'Ǜ', 'Ü',
+            'ǖ', 'ǘ', 'ǚ', 'ǜ', 'ü', 
             // numbers for numbered Pinyin
             '0', '1', '2', '3', '4', '5');
     private List <Character> pinyinVowels = Arrays.asList(
             'a', 'e', 'i', 'o', 'u', 'v', 'ü');
+    private StringCharacterIterator nonwordIterator = null;
+    private int nonwordOffset = -1;
     
     /**
      * 
@@ -135,7 +139,9 @@ public class PinyinSyllableTokenizer extends Tokenizer{
      * boundaries and are not included in tokens.
      */
     protected boolean isTokenChar(int c) {
-        return (c > 96 && c < 123) || (c > 64 && c < 91) || unihanPinyinDiacritics.contains((char) c);
+        return (c > 96 && c < 123) || (c > 64 && c < 91) 
+                || unihanPinyinDiacritics.contains((char) c)
+                || pinyinVowels.contains((char) c);
     }
 
     /**
@@ -147,6 +153,20 @@ public class PinyinSyllableTokenizer extends Tokenizer{
 
     @Override
     public final boolean incrementToken() throws IOException {
+        if (nonwordIterator != null) {
+            char next = nonwordIterator.next();
+            if (next != CharacterIterator.DONE) {
+                termAtt.setEmpty().append(next);
+                nonwordOffset ++;
+                offsetAtt.setOffset(correctOffset(nonwordOffset), correctOffset(nonwordOffset + 1));
+                typeAtt.setType("non-word");
+                return true;
+            } else {
+                nonwordIterator = null;
+                nonwordOffset = -1;
+            }
+        }
+        
         boolean debug = true;
         if (debug) {System.out.println("----------");}
         
@@ -202,40 +222,52 @@ public class PinyinSyllableTokenizer extends Tokenizer{
                 }
                 
                 tokenEnd = bufferIndex;  // has to be incremented before breaking
+                int lastCharIdx = (termAtt.length() - 1 < 0) ? 0: termAtt.length() - 1;
                 
-                /* reached the end of the longest syllable or a non-syllable */
-                if (!continuing){
-                    int lastCharIdx = (tokenLength - 1 < 0) ? 0: tokenLength - 1;
-                    
-                    /* current char does not belong to the current syllable
-                     * (current char is a vowel and previous letter is 'g' or 'n') */
-                    if ((pinyinVowels.contains((char) c) || unihanPinyinDiacritics.contains((char) c)) 
+                /* current char does not belong to the current syllable
+                 * (current char is a vowel and previous letter is 'g' or 'n') */  
+                if (hasMatched && lastCharIdx > 0 && (pinyinVowels.contains((char) c) || unihanPinyinDiacritics.contains((char) c)) 
                             && (termAtt.length() > 0 && 
                                     (tokenBuffer[lastCharIdx] == 'g' || tokenBuffer[lastCharIdx] == 'n'))) {
                         tokenLength --;
                         bufferIndex -= 2;
                         break;
-                    
-                    /* there is a match or a non-match */
-                    } else {                        
-                        if (!match) {
-                            if (hasMatched || tokenLength >= 1) {
-                                bufferIndex --;
-                                break;
-                            } else {
-                                IncrementTokenLengthAndAddCurrentCharTo(tokenBuffer, c);
-                                break;
-                            }
-                        } else if (bufferIndex >= longestMatchIdx) {
-                            if (pinyinVowels.contains((char) c) || unihanPinyinDiacritics.contains((char) c)) { 
-                                IncrementTokenLengthAndAddCurrentCharTo(tokenBuffer, c);
-                                break;
-                            } else if (bufferIndex > longestMatchIdx) {
-                                bufferIndex --;
-                                break;
-                            }
+                                 
+//                /* it is a non-word: return a non-word token containing the current char */
+//                } else if (!match && !continuing) {
+//                        IncrementTokenLengthAndAddCurrentCharTo(tokenBuffer, c);
+//                        break;
+               
+                /* reached the end of the longest syllable or a non-syllable */
+                } else if (!continuing){                        
+                    if (!match) {
+                        if (!hasMatched && tokenLength == 1) {
+                            bufferIndex --;
+                            break;
+                        
+                        } else if (!hasMatched && tokenLength > 1) {
+                            IncrementTokenLengthAndAddCurrentCharTo(tokenBuffer, c);
+                            break;
+//
+//                        } else if (hasMatched && unihanPinyinDiacritics.contains((char) c)) {
+//                            break;
+               
+                        } else if (hasMatched && tokenLength >= 1) {
+                            bufferIndex --;
+                            break;
+                        
+                        } else {
+                            IncrementTokenLengthAndAddCurrentCharTo(tokenBuffer, c);
+                            break;
                         }
-
+                    } else if (bufferIndex >= longestMatchIdx) {
+                        if (pinyinVowels.contains((char) c) || unihanPinyinDiacritics.contains((char) c)) { 
+                            IncrementTokenLengthAndAddCurrentCharTo(tokenBuffer, c);
+                            break;
+                        } else if (bufferIndex > longestMatchIdx) {
+                            bufferIndex --;
+                            break;
+                        }
                     }
                 }
                 
@@ -250,11 +282,21 @@ public class PinyinSyllableTokenizer extends Tokenizer{
             }
         }
 
+        if (!hasMatched) {
+            typeAtt.setType("non-word");
+            
+            /* non-word has more than one character */
+            if (termAtt.length() > 1) {
+                nonwordIterator  = new StringCharacterIterator(termAtt.toString());
+                termAtt.setLength(1);
+                nonwordOffset = tokenStart;
+                offsetAtt.setOffset(correctOffset(tokenStart), correctOffset(tokenStart + 1));
+                return true;
+            }
+        }
         termAtt.setLength(tokenLength);
         assert tokenStart != -1;
         offsetAtt.setOffset(correctOffset(tokenStart), correctOffset(tokenEnd));
-        if (!hasMatched)
-            typeAtt.setType("non-word");
         return true;
     }
     

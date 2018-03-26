@@ -87,7 +87,7 @@ public class BuildCompiledTrie {
         Trie trie = new Trie(true);
         for (String syl: validSyllables) {
             trie.add(syl, " ");
-            for (int i = 1; i<= 4; i++) {
+            for (int i = 0; i<= 5; i++) {
                 String numbered = syl + i;
                 trie.add(numbered, " ");
                 trie.add(PinyinNumberedToMarkedFilter.numberedToMarked(numbered), " ");
