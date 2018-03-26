@@ -355,6 +355,19 @@ public class ChineseComponentsTests  {
     }
     
     @Test
+    public void testSyllabifier6() throws IOException
+    {
+        String input = "lün1lvn2wan4nian2jing1";
+        Reader reader = new StringReader(input);
+        List<String> expected = Arrays.asList("lǖn", "lǘn", "wàn", "nián", "jīng");
+        System.out.println("0 " + input);
+        Tokenizer tok = new PinyinSyllableTokenizer();
+        TokenStream words = tokenize(reader, tok);
+        TokenStream pinyin = new PinyinNumberedToMarkedFilter(words);
+        assertTokenStream(pinyin, expected);
+    }
+    
+    @Test
     public void bugSimplifiedChinese() throws IOException
     {
         // input and output from https://github.com/BYVoid/OpenCC/tree/master/test/testcases
