@@ -24,9 +24,6 @@ public class PrettyPrintResult {
     
     /**
      * 
-     * @param args
-     *              args[0]: the file to be processed, preferably one word per line
-     *              remaining ones: profiles to be used
      * Output:
      *          for a file containing "一\n一些\n一何" and "TC2SC TC2PYstrict TC2PYlazy"
      *          the output is:
@@ -35,6 +32,11 @@ public class PrettyPrintResult {
      *          一     一     yī          yi  
      *          一些   一些    yīxiē       yixie   
      *          一何   一何    yīhé        yihe    
+     *
+     * @param args - args[0]: the file to be processed, preferably one word per line
+     *             - remaining args: profiles to be used
+     * @throws FileNotFoundException  can't find the file to be processed
+     * @throws IOException can't write the output to a file
      */
     public static void main(String[] args) throws FileNotFoundException, IOException{
                 

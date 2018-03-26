@@ -35,7 +35,7 @@ import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
  * to their arabic counterparts, this Filter is not used in ChineseAnalyzer 
  * (See @see <a href="http://www.mandarintools.com/numbers.html">here</a>)
  * 
- * @see <a href="https://en.wikibooks.org/wiki/Chinese_(Mandarin)/Numbers">This</a> article also shows that these numeral
+ * The article at "https://en.wikibooks.org/wiki/Chinese_(Mandarin)/Numbers" also shows that these numeral
  * ideograms have different meanings, like: '貳(2) can also mean "to betray"'. 
  * !!!
  * 
