@@ -71,8 +71,13 @@
             <resource>
                 <directory>src/main/resources/</directory>
                 <includes>
-                    <include>skrt-compiled-trie.dump</include>
-                    <include>skrt-stopwords.txt</include>
+                    <include>zh_py-compiled-trie.dump</include>
+                    <include>pinyin.tsv</include>
+                    <include>tc2sc.tsv</include>
+                    <include>zh-alternatives.tsv</include>
+                    <include>zh-numbers.tsv</include>
+                    <include>zh-synonyms.tsv</include>
+                    <include>zh-stopwords.txt</include>
                 </includes>
                 <!--  <targetPath>resources</targetPath> -->
             </resource>
