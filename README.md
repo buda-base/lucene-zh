@@ -1,6 +1,25 @@
 # Lucene Analyzers for Buddhist Chinese
 
-## Indexing Pipeline:
+This repository contains bricks to process Chinese in Lucene, mainly:
+- stopwords
+- SC/TC conversion
+- Hanzi variants
+- Hanzi to Pinyin conversion
+- Pinyin syllable tokenizer
+
+## Installation
+
+You can install this analyzer from Maven:
+
+```xml
+    <dependency>
+      <groupId>io.bdrc.lucene</groupId>
+      <artifactId>lucene-zh</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+```
+
+## Indexing Pipeline
 
 ```
 TC ⟾ normalized TC ⟾ SC ⟾ normalized SC ⟾ normalized PY_full ⟾ normalized PY_lazy
@@ -8,12 +27,7 @@ TC ⟾ normalized TC ⟾ SC ⟾ normalized SC ⟾ normalized PY_full ⟾ normali
 
 `normalized TC/SC`: any combination of the following treatments: synonyms, alternatives and stopwords.
 
-`normalized PY`: PY is lower-cased and split in syllables (to match the general policy of indexing individual ideograms).
-
-The pipeline may start at any step and may end at any step.
-For example, words in lazy pinyin only need to be normalized.
-
-Including the diacritics in a PY index allows to reduce the homophones, thus reducing the noise in the results.
+`normalized PY`: PY is lower-cased and split in syllables (to match the general policy of indexing individual ideograms). We call `PY_full` Pinyin with tone indication (diacritics or numbers) and `PY_lazy` Pinyin with no tone indication.
 
 ## Constructors
 
@@ -80,12 +94,17 @@ Leverages Unihan's kZVariant field to index the same variant for stylistic varia
 
 ## Sizes
 
-In the Unihan database, 88884 codepoints have an entry(both full ideograms and parts of surrogate pairs).
+In the Unihan database for Unicode 10, 88884 codepoints have an entry (adding full ideograms and parts of surrogate pairs).
 82829 entries have no information about being TC nor SC, 3037 are specifically TC, 3007 are specifically SC and 11 have information about both TC and SC.
 
-There are 1655 possible syllables in full PY, 469 in lazy PY (syllable size spans from 1 to 6 chars).
+There are 1655 possible syllables in PY and 469 in PY with no diacritics.
 
-OpenCC adds 1015 TC to SC pairs.
+## Maven options
+
+The following options alter the packaging:
+
+- `-DincludeDeps=true` includes `io.bdrc.lucene:stemmer` in the produced jar file
+- `-DperformRelease=true` signs the jar file with gpg
 
 ## Resources
 
