@@ -93,6 +93,8 @@ public class PinyinSyllableTokenizer extends Tokenizer{
     private StringCharacterIterator nonwordIterator = null;
     private int nonwordOffset = -1;
     
+    boolean debug = false;
+    
     /**
      * 
      * @throws FileNotFoundException  the file of the compiled Trie is not found
@@ -172,7 +174,6 @@ public class PinyinSyllableTokenizer extends Tokenizer{
             }
         }
         
-        boolean debug = true;
         if (debug) {System.out.println("----------");}
         
         clearAttributes();

@@ -129,6 +129,21 @@
         </profile>
       </profiles>
       <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources/</directory>
+                <includes>
+                    <include>zh_py-compiled-trie.dump</include>
+                    <include>pinyin.tsv</include>
+                    <include>tc2sc.tsv</include>
+                    <include>zh-alternatives.tsv</include>
+                    <include>zh-numbers.tsv</include>
+                    <include>zh-synonyms.tsv</include>
+                    <include>zh-stopwords.txt</include>
+                </includes>
+                <!--  <targetPath>resources</targetPath> -->
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -153,6 +168,25 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lucene-zh-libs</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
