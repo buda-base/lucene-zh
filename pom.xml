@@ -141,7 +141,6 @@
                     <include>zh-synonyms.tsv</include>
                     <include>zh-stopwords.txt</include>
                 </includes>
-                <!--  <targetPath>resources</targetPath> -->
             </resource>
         </resources>
         <plugins>
@@ -168,25 +167,6 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lucene-zh-libs</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
