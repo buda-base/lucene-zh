@@ -13,7 +13,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.junit.Test;
 
-public class ChineseAnalyzerTests {    
+public class ChineseAnalyzerTest {    
     
     // adapted from https://stackoverflow.com/a/9562816
     public static List<String> parseTokens(Analyzer analyzer, String input) throws IOException {

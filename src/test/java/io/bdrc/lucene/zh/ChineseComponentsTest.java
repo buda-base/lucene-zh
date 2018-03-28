@@ -42,7 +42,7 @@ import org.junit.Test;
  * 
  * @author Hélios Hildt
  */
-public class ChineseComponentsTests  {
+public class ChineseComponentsTest  {
 
     static TokenStream tokenize(Reader reader, Tokenizer tokenizer) throws IOException {
         tokenizer.close();
