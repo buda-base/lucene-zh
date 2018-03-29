@@ -204,7 +204,6 @@ public class ChineseAnalyzerTest {
     @Test
     public void testPYstrict() throws IOException
     {
-        // r3 is a non-word. it will be tokenized into 'r' + '3'. numbers in non-valid syllables are left intact.
         String input = "Rú sHì Wǒ wéN yi0 yi5 miao1";
         List<String> expected = Arrays.asList("rú", "shì", "wǒ", "wén", "yi", "yi", "miāo");
         Analyzer ca = new ChineseAnalyzer("PYstrict");
@@ -214,4 +213,18 @@ public class ChineseAnalyzerTest {
         System.out.println();
         assertEquals(expected, tokens);
     }
+    
+    @Test
+    public void testTC2PyStrict() throws IOException
+    {
+        String input = "丹 珠 尔";
+        List<String> expected = Arrays.asList("dān", "zhū", "ěr");
+        Analyzer ca = new ChineseAnalyzer("TC2PYstrict", false, 0);
+        List<String> tokens = parseTokens(ca, input);
+        System.out.println("1 " + expected.toString());
+        System.out.println("2 " + tokens.toString());
+        System.out.println();
+        assertEquals(expected, tokens);
+    }
+    
 }
