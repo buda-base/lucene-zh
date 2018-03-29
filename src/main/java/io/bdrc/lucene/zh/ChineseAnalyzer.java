@@ -172,7 +172,7 @@ public final class ChineseAnalyzer extends Analyzer {
             this.inputEncoding = "PYstrict";
             this.indexEncoding = "PYstrict";
 
-        } else if (profile.equals("PYstrictToPYlazy")) {
+        } else if (profile.equals("PYstrict2PYlazy")) {
             this.inputEncoding = "PYstrict";
             this.indexEncoding = "PYlazy";
 
