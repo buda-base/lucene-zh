@@ -22,28 +22,41 @@ You can install this analyzer from Maven:
 ## Indexing Pipeline
 
 ```
-TC ⟾ normalized TC ⟾ SC ⟾ normalized SC ⟾ normalized PY_full ⟾ normalized PY_lazy
+TC ⟾ normalized TC ⟾ SC ⟾ normalized SC ⟾ normalized PY_strict ⟾ normalized PY_lazy
 ```
 
 `normalized TC/SC`: any combination of the following treatments: synonyms, alternatives and stopwords.
 
-`normalized PY`: PY is lower-cased and split in syllables (to match the general policy of indexing individual ideograms). We call `PY_full` Pinyin with tone indication (diacritics or numbers) and `PY_lazy` Pinyin with no tone indication.
+`normalized PY`: PY is lower-cased and split in syllables (to match the general policy of indexing individual ideograms). We call `PY_strict` Pinyin with tone indication (diacritics or numbers) and `PY_lazy` Pinyin with no tone indication.
 
 ## Constructors
 
 ```
 ChineseAnalyzer(String indexEncoding,String inputEncoding,boolean stopwords, int variants) 
-    indexEncoding- "TC", "SC", "PY_full" or "PY_lazy"
-    inputEncoding- "TC", "SC", "PY_full" or "PY_lazy"
+    indexEncoding- "TC", "SC", "PY_strict" or "PY_lazy"
+    inputEncoding- "TC", "SC", "PY_strict" or "PY_lazy"
     stopWords    - true to filter stopwords, false otherwise
     variants     - 0: no variant; 1: synonyms; 2: alternatives; 3: both
 ```
 
 ```
 ChineseAnalyzer(String profile)
-    profile == "exact"- ChineseAnalyzer("TC", "TC", false, 0)
-    (...)
 ```
+
+| Profiles            | inputEncoding | indexEncoding | stopWords | variants |
+| :------------------ | :------------ | :------------ | :-------- | :------: |
+| `exactTC`          | TC            | TC            | false     | 0        |
+| `TC`               | TC            | TC            | true      | 3        |
+| `TC2SC`            | TC            | SC            | true      | 3        |
+| `TC2PYstrict`     | TC            | PYstrict      | true      | 3        |
+| `TC2PYlazy`       | TC            | PYlazy        | true      | 3        |
+| `SC`               | SC            | SC            | true      | 3        |
+| `SC2PYstrict`     | SC            | PYstrict      | true      | 3        |
+| `SC2PYlazy`       | SC            | PYlazy        | true      | 3        |
+| `PYstrict`        | PYstrict      | PYstrict      | false     | 0        |
+| `PYstrict2PYlazy`| PYstrict      | PYlazy        | false     | 0        |
+| `PYlazy`          | PYlazy        | PYlazy        | false     | 0        |
+
 
 ## Components
 
