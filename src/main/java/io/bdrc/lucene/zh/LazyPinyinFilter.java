@@ -41,17 +41,15 @@ import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
 public class LazyPinyinFilter extends TokenFilter {
 
-    private HashMap<String, String> map;
-    private List<Character> pinyinNumbers = Arrays.asList('0', '1', '2', '3', '4', '5');
+    private static final HashMap<String, String> map = getMapping();
+    private static final List<Character> pinyinNumbers = Arrays.asList('0', '1', '2', '3', '4', '5');
 
     public LazyPinyinFilter(TokenStream in) {
         super(in);
-        map = getMapping();
     }
 
-    public final HashMap<String, String> getMapping() {
-        map = new HashMap<String, String>();
-        
+    public static final HashMap<String, String> getMapping() {
+        HashMap<String, String> map = new HashMap<>();
         map.put("ā", "a");
         map.put("á", "a");
         map.put("ǎ", "a");

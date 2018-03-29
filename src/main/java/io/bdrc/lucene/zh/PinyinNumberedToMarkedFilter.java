@@ -47,6 +47,19 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
  */
 public class PinyinNumberedToMarkedFilter extends TokenFilter {
 
+    private static final String markedVowels = "āáǎàaēéěèeīíǐìiōóǒòoūúǔùuǖǘǚǜü";
+    private static final List<Character> toneNumbers = Arrays.asList('1', '2', '3', '4', '5', '0');
+    private static final HashMap<Character, Integer> rows = new HashMap<Character, Integer>();
+    static {
+        rows.put('a', 0);
+        rows.put('e', 1);
+        rows.put('i', 2);
+        rows.put('o', 3);
+        rows.put('u', 4);
+        rows.put('v', 5);
+        rows.put('ü', 5);
+    }
+    
     public PinyinNumberedToMarkedFilter(TokenStream in) throws IOException {
         super(in);
     }
@@ -59,17 +72,6 @@ public class PinyinNumberedToMarkedFilter extends TokenFilter {
      *          else returns the syllable as-is.
      */
     public static String numberedToMarked(String pinyinStr) {
-        List<Character> toneNumbers = Arrays.asList('1', '2', '3', '4', '5', '0');
-        final String markedVowels = "āáǎàaēéěèeīíǐìiōóǒòoūúǔùuǖǘǚǜü";
-        HashMap<Character, Integer> rows = new HashMap<Character, Integer>();
-        rows.put('a', 0);
-        rows.put('e', 1);
-        rows.put('i', 2);
-        rows.put('o', 3);
-        rows.put('u', 4);
-        rows.put('v', 5);
-        rows.put('ü', 5);
-        
         char number = pinyinStr.charAt(pinyinStr.length()-1);
         /* there is a numbered tone and a pinyin vowel */
         if (toneNumbers.contains(number) && (pinyinStr.contains("a") || pinyinStr.contains("e")

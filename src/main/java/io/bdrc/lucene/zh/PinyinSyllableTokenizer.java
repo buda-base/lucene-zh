@@ -75,7 +75,7 @@ public class PinyinSyllableTokenizer extends Tokenizer{
     private int tokenStart;
     private int tokenEnd;
     
-    private List<Character> unihanPinyinDiacritics = Arrays.asList(
+    private static final List<Character> unihanPinyinDiacritics = Arrays.asList(
             'Ā', 'Á', 'Ǎ', 'À', 
             'ā', 'á', 'ǎ', 'à', 
             'Ē', 'É', 'Ě', 'È', 
@@ -88,8 +88,8 @@ public class PinyinSyllableTokenizer extends Tokenizer{
             'ū', 'ú', 'ǔ', 'ù', 
             'Ǖ', 'Ǘ', 'Ǚ', 'Ǜ', 'Ü',
             'ǖ', 'ǘ', 'ǚ', 'ǜ', 'ü');
-    private List <Character> pinyinVowels = Arrays.asList('a', 'e', 'i', 'o', 'u', 'v', 'ü');
-    private List<Character> pinyinNumbers = Arrays.asList('0', '1', '2', '3', '4', '5');
+    private static final List <Character> pinyinVowels = Arrays.asList('a', 'e', 'i', 'o', 'u', 'v', 'ü');
+    private static final List<Character> pinyinNumbers = Arrays.asList('0', '1', '2', '3', '4', '5');
     private StringCharacterIterator nonwordIterator = null;
     private int nonwordOffset = -1;
     
