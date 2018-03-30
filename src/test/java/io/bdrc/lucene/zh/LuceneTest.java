@@ -56,12 +56,21 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.assertEquals;
 
-
+/**
+ * Tests emulating a whole Lucene system.
+ * Creates a temporary folder that receives the temporary file with the input string 
+ * and the index generated from it.
+ * The index is then queried and the number of matching documents (1 or 0) is displayed,
+ * together with the score.
+ * 
+ * @author Hélios Hildt
+ *
+ */
 public class LuceneTest {
-    
+
     @Rule
-    public TemporaryFolder folder= new TemporaryFolder();
-    
+    public TemporaryFolder folder = new TemporaryFolder();
+
     @Test
     public void testTC2PYstrict() throws IOException, ParseException {
         String inputProfile = "TC";
@@ -76,14 +85,15 @@ public class LuceneTest {
 
         indexTest(input, indexingAnalyzer, testSubFolder);
         int hits = searchIndex(query, queryingAnalyzer, testSubFolder, 1);
-        folder.delete();  // just to be sure it is done
+        folder.delete(); // just to be sure it is done
 
         assertEquals(hits, 1);
     }
-    
-    int searchIndex(String queryString, Analyzer analyzer, File indexFolder, int repeat) throws IOException, ParseException {
+
+    int searchIndex(String queryString, Analyzer analyzer, File indexFolder, int repeat)
+            throws IOException, ParseException {
         String field = "contents";
-        
+
         IndexReader reader = DirectoryReader.open(FSDirectory.open(indexFolder.toPath()));
         IndexSearcher searcher = new IndexSearcher(reader);
         QueryParser parser = new QueryParser(field, analyzer);
@@ -92,7 +102,7 @@ public class LuceneTest {
         ScoreDoc[] hits = null;
         int numTotalHits = -1;
 
-        if (repeat > 0) {                           // repeat & time as benchmark
+        if (repeat > 0) { // repeat & time as benchmark
             Date start = new Date();
             for (int i = 0; i < repeat; i++) {
                 results = searcher.search(query, 100);
@@ -100,20 +110,20 @@ public class LuceneTest {
                 numTotalHits = results.totalHits;
             }
             Date end = new Date();
-            System.out.println("Time: "+(end.getTime()-start.getTime())+"ms");
+            System.out.println("Time: " + (end.getTime() - start.getTime()) + "ms");
         }
         System.out.println(numTotalHits + " total matching documents");
-        
+
         for (int i = 0; i < hits.length; i++) {
             // output raw format
-            System.out.println("\tdoc="+hits[i].doc+" score="+hits[i].score);
-            
+            System.out.println("\tdoc=" + hits[i].doc + " score=" + hits[i].score);
+
         }
-        
+
         reader.close();
         return numTotalHits;
     }
-    
+
     /** Bootstrapping for indexDoc() */
     void indexTest(String input, Analyzer analyzer, File testSubFolder) throws IOException {
         // create temp file and write input string in it.
@@ -121,7 +131,7 @@ public class LuceneTest {
         BufferedWriter bw = new BufferedWriter(new FileWriter(testFile));
         bw.write(input);
         bw.close();
-        
+
         // config for indexDoc()
         final Path docPath = Paths.get(testFile.getAbsolutePath());
         Directory dir = FSDirectory.open(Paths.get(testSubFolder.getAbsolutePath()));
@@ -130,26 +140,27 @@ public class LuceneTest {
         IndexWriter writer = new IndexWriter(dir, iwc);
         indexDoc(writer, docPath, Files.getLastModifiedTime(docPath).toMillis());
     }
-    
+
     /** Indexes a single document */
     static void indexDoc(IndexWriter writer, Path file, long lastModified) throws IOException {
-      try (InputStream stream = Files.newInputStream(file)) {
-        // make a new, empty document
-        Document doc = new Document();
-        
-        // path field in the index
-        Field pathField = new StringField("path", file.toString(), Field.Store.YES);
-        doc.add(pathField);
-        
-        // modified field in index (last modified date of file)
-        doc.add(new LongPoint("modified", lastModified));
-         
-        // file content is tokenized and indexed, but not stored. (UTF-8 expected)
-        doc.add(new TextField("contents", new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))));
-        
-        // New index, so we just add the document (no old document can be there):
-        writer.addDocument(doc); 
-        writer.close();
-      }
+        try (InputStream stream = Files.newInputStream(file)) {
+            // make a new, empty document
+            Document doc = new Document();
+
+            // path field in the index
+            Field pathField = new StringField("path", file.toString(), Field.Store.YES);
+            doc.add(pathField);
+
+            // modified field in index (last modified date of file)
+            doc.add(new LongPoint("modified", lastModified));
+
+            // file content is tokenized and indexed, but not stored. (UTF-8 expected)
+            doc.add(new TextField("contents",
+                    new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))));
+
+            // New index, so we just add the document (no old document can be there):
+            writer.addDocument(doc);
+            writer.close();
+        }
     }
 }
