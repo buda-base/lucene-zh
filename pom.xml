@@ -69,6 +69,7 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
             <version>6.4.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <profiles>
