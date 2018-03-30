@@ -64,19 +64,20 @@ public class LuceneTest {
     
     @Test
     public void testTC2PYstrict() throws IOException, ParseException {
-        String profile = "TC2PYstrict";
+        String inputProfile = "TC";
+        String queryProfile = "TC";
         String input = "丹珠尔";
-        String query = "dān zhū ěr";
-        
-        Analyzer indexingAnalyzer = new ChineseAnalyzer(profile, false, 0);
-        Analyzer queryingAnalyzer = new StandardAnalyzer();
-        
-        File testSubFolder = folder.newFolder(profile);
-        
+        String query = "丹珠尔";
+
+        Analyzer indexingAnalyzer = new ChineseAnalyzer(inputProfile, false, 0);
+        Analyzer queryingAnalyzer = new ChineseAnalyzer(queryProfile, false, 0);
+
+        File testSubFolder = folder.newFolder(inputProfile);
+
         indexTest(input, indexingAnalyzer, testSubFolder);
         int hits = searchIndex(query, queryingAnalyzer, testSubFolder, 1);
         folder.delete();  // just to be sure it is done
-        
+
         assertEquals(hits, 1);
     }
     
