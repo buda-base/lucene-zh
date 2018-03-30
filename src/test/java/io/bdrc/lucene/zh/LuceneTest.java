@@ -33,7 +33,6 @@ import java.nio.file.Paths;
 import java.util.Date;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.LongPoint;
@@ -64,10 +63,10 @@ public class LuceneTest {
     
     @Test
     public void testTC2PYstrict() throws IOException, ParseException {
-        String inputProfile = "TC";
-        String queryProfile = "TC";
+        String inputProfile = "TC2PYstrict";
+        String queryProfile = "PYstrict";
         String input = "丹珠尔";
-        String query = "丹珠尔";
+        String query = "dān zhū ěr";
 
         Analyzer indexingAnalyzer = new ChineseAnalyzer(inputProfile, false, 0);
         Analyzer queryingAnalyzer = new ChineseAnalyzer(queryProfile, false, 0);
