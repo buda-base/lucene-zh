@@ -142,7 +142,7 @@ public class ChineseAnalyzerTest {
                 "zai", "luo", "yue", "qi", "qi", "du", "jue", "shan", "zhong", "yu", "da", 
                 "bi", "qiu", "zhong", "qian", "er", "bai", "wu", "shi", "ren", "pu", "sa", 
                 "wu", "qian", "ren", "ju");
-        Analyzer ca = new ChineseAnalyzer("PYstrictToPYlazy");
+        Analyzer ca = new ChineseAnalyzer("PYstrict2PYlazy");
         List<String> tokens = parseTokens(ca, input);
         System.out.println("1 " + expected.toString());
         System.out.println("2 " + tokens.toString());
@@ -193,7 +193,7 @@ public class ChineseAnalyzerTest {
         String input = "Rú sHì Wǒ wéN. +@/* r3 yi0 yi5 miao1 fei1 zhou3 huo3 lün1 lvn2 yi1 wan4 nian2 jing1";
         List<String> expected = Arrays.asList("ru", "shi", "wo", "wen", "r", "3", "yi", "yi", "miao", "fei", 
                 "zhou", "huo", "lun", "lun", "yi", "wan", "nian", "jing");
-        Analyzer ca = new ChineseAnalyzer("PYstrictToPYlazy");
+        Analyzer ca = new ChineseAnalyzer("PYstrict2PYlazy");
         List<String> tokens = parseTokens(ca, input);
         System.out.println("1 " + expected.toString());
         System.out.println("2 " + tokens.toString());
