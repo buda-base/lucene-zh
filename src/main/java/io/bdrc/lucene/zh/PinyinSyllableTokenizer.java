@@ -108,7 +108,7 @@ public class PinyinSyllableTokenizer extends Tokenizer{
             if (!new File(compiledTrieName).exists()) {
                 System.out.println("The default compiled Trie is not found ; building it will take some time!");
                 long start = System.currentTimeMillis();
-                this.scanner = BuildCompiledTrie.compileTrie();
+                this.scanner = BuildCompiledTrie.buildTrie();
                 long end = System.currentTimeMillis();
                 System.out.println("Trie built in " + (end - start) / 1000 + "s.");
                 ioBuffer = new RollingCharBuffer();
