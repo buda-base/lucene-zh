@@ -19,6 +19,19 @@ You can install this analyzer from Maven:
     </dependency>
 ```
 
+## Building from source
+
+A compiled Trie is needed in order to build a complete jar, the base command line to build a jar is thus:
+
+```
+mvn clean compile exec:java package
+```
+
+The following options alter the packaging:
+
+- `-DincludeDeps=true` includes `io.bdrc.lucene:stemmer` in the produced jar file
+- `-DperformRelease=true` signs the jar file with gpg
+
 ## Indexing Pipeline
 
 ```
@@ -111,13 +124,6 @@ In the Unihan database for Unicode 10, 88884 codepoints have an entry (adding fu
 82829 entries have no information about being TC nor SC, 3037 are specifically TC, 3007 are specifically SC and 11 have information about both TC and SC.
 
 There are 1655 possible syllables in PY and 469 in PY with no diacritics.
-
-## Maven options
-
-The following options alter the packaging:
-
-- `-DincludeDeps=true` includes `io.bdrc.lucene:stemmer` in the produced jar file
-- `-DperformRelease=true` signs the jar file with gpg
 
 ## Resources
 
