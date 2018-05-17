@@ -194,6 +194,7 @@ public final class ChineseAnalyzer extends Analyzer {
                 reader = new ZhStopWordsFilter(reader);
             } catch (IOException e) {
                 e.printStackTrace();
+                return null;
             }
         }
         
@@ -216,6 +217,7 @@ public final class ChineseAnalyzer extends Analyzer {
                 tok = new PinyinSyllableTokenizer();
             } catch (IOException e) {
                 e.printStackTrace();
+                return null;
             }
         } else {
             tok = new StandardTokenizer();
@@ -234,6 +236,7 @@ public final class ChineseAnalyzer extends Analyzer {
                     tokenStream = new ZhSynonymFilter(tokenStream);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    return null;
                 }
             
             } else if (variants == 2) {
@@ -241,6 +244,7 @@ public final class ChineseAnalyzer extends Analyzer {
                     tokenStream = new ZhAlternatesFilter(tokenStream);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    return null;
                 }
             
             } else if (variants == 3) {
@@ -248,11 +252,13 @@ public final class ChineseAnalyzer extends Analyzer {
                     tokenStream = new ZhSynonymFilter(tokenStream);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    return null;
                 }
                 try {
                     tokenStream = new ZhAlternatesFilter(tokenStream);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    return null;
                 }
             }
         }
@@ -263,6 +269,7 @@ public final class ChineseAnalyzer extends Analyzer {
                 tokenStream = new TC2SCFilter(tokenStream);
             } catch (IOException e) {
                 e.printStackTrace();
+                return null;
             }
         
         /* indexing from ideograms to pinyin */
@@ -271,6 +278,7 @@ public final class ChineseAnalyzer extends Analyzer {
                 tokenStream = new ZhToPinyinFilter(tokenStream);
             } catch (IOException e) {
                 e.printStackTrace();
+                return null;
             }
             
             if (this.indexEncoding.equals("PYlazy")) {
@@ -285,6 +293,7 @@ public final class ChineseAnalyzer extends Analyzer {
                     tokenStream = new PinyinNumberedToMarkedFilter(tok);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    return null;
                 }
             } else if (this.indexEncoding.equals("PYlazy") && !this.inputEncoding.equals("PYlazy")) {
                 if (this.inputEncoding.equals("PYstrict")) {
@@ -292,6 +301,7 @@ public final class ChineseAnalyzer extends Analyzer {
                         tokenStream = new PinyinNumberedToMarkedFilter(tok);
                     } catch (IOException e) {
                         e.printStackTrace();
+                        return null;
                     }
                     tokenStream = new LazyPinyinFilter(tokenStream);
                 } else {
