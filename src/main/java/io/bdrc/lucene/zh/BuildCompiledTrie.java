@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.bdrc.lucene.stemmer.Trie;
+import io.bdrc.lucene.stemmer.Reduce;
 
 public class BuildCompiledTrie {
     static String outFile = "src/main/resources/zh_py-compiled-trie.dump";
@@ -93,6 +94,7 @@ public class BuildCompiledTrie {
                 trie.add(PinyinNumberedToMarkedFilter.numberedToMarked(numbered), " ");
             }
         }
+        trie = new Reduce().optimize(trie); // optimize it
         return trie;
     }
     
