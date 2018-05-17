@@ -106,7 +106,7 @@ public class PinyinSyllableTokenizer extends Tokenizer{
         if (stream == null) {  // we're not using the jar, there is no resource, assuming we're running the code
             String compiledTrieName = "src/main/resources/zh_py-compiled-trie.dump";
             if (!new File(compiledTrieName).exists()) {
-                System.out.println("The default compiled Trie is not found ; building it will take some time!");
+                System.out.println("The default compiled Trie is not found");
                 long start = System.currentTimeMillis();
                 this.scanner = BuildCompiledTrie.buildTrie();
                 long end = System.currentTimeMillis();
