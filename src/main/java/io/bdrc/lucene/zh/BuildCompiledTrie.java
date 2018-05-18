@@ -94,7 +94,7 @@ public class BuildCompiledTrie {
                 trie.add(PinyinNumberedToMarkedFilter.numberedToMarked(numbered), " ");
             }
         }
-        trie = new Reduce().optimize(trie); // optimize it
+        //trie = new Reduce().optimize(trie); // optimize it
         return trie;
     }
     
