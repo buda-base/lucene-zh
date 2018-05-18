@@ -226,5 +226,18 @@ public class ChineseAnalyzerTest {
         System.out.println();
         assertEquals(expected, tokens);
     }
-    
+
+    // TODO: fix: doesn't work because 经 is a stopword 
+    @Test
+    public void testTC2SC() throws IOException
+    {
+        String input = "經";
+        List<String> expected = Arrays.asList("经");
+        Analyzer ca = new ChineseAnalyzer("TC2SC", true, 3);
+        List<String> tokens = parseTokens(ca, input);
+        System.out.println("1 " + expected.toString());
+        System.out.println("2 " + tokens.toString());
+        System.out.println();
+        assertEquals(expected, tokens);
+    }
 }
