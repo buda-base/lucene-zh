@@ -19,10 +19,10 @@
  ******************************************************************************/
 package io.bdrc.lucene.zh;
 
-import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.lucene.analysis.charfilter.MappingCharFilter;
+import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
 
 /**
  * !!! IMPORTANT
@@ -47,7 +47,9 @@ import org.apache.lucene.analysis.charfilter.MappingCharFilter;
 
 public class ZhNumericFilter extends MappingCharFilter {
     
-    public ZhNumericFilter(Reader in) throws IOException {
-        super(CommonHelpers.getNormalizeCharMap("zh-numbers.tsv", false), in);
+    private static final NormalizeCharMap map = CommonHelpers.getNormalizeCharMap("zh-numbers.tsv", false);
+    
+    public ZhNumericFilter(Reader in) {
+        super(map, in);
     }
 }

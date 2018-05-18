@@ -40,14 +40,12 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 public class ZhSynonymFilter extends TokenFilter {
 
-    private final HashMap<String, String> map;
-
-    public ZhSynonymFilter(TokenStream in) throws IOException {
-        super(in);
-        map = CommonHelpers.getMappings("zh-synonyms.tsv");
-    }
-
+    private static final HashMap<String, String> map = CommonHelpers.getMappings("zh-synonyms.tsv");
     CharTermAttribute charTermAttribute = addAttribute(CharTermAttribute.class);
+
+    public ZhSynonymFilter(TokenStream in) {
+        super(in);
+    }
 
     @Override
     public final boolean incrementToken() throws IOException {

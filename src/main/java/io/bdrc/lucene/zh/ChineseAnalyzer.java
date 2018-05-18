@@ -19,8 +19,6 @@
  ******************************************************************************/
 package io.bdrc.lucene.zh;
 
-
-import java.io.IOException;
 import java.io.Reader;
 import java.security.InvalidParameterException;
 
@@ -190,12 +188,7 @@ public final class ChineseAnalyzer extends Analyzer {
         
         /* if (the input is not PY and we want to filter stopwords) */
         if (!this.inputEncoding.startsWith("PY") && this.stopwords) {
-            try {
-                reader = new ZhStopWordsFilter(reader);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
+            reader = new ZhStopWordsFilter(reader);
         }
         
          /* normalize all incoming Pinyin */
@@ -213,12 +206,7 @@ public final class ChineseAnalyzer extends Analyzer {
         TokenStream tokenStream = null;
         
         if (this.inputEncoding.startsWith("PY")) {
-            try {
-                tok = new PinyinSyllableTokenizer();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
+            tok = new PinyinSyllableTokenizer();
         } else {
             tok = new StandardTokenizer();
         }
@@ -232,55 +220,21 @@ public final class ChineseAnalyzer extends Analyzer {
             if (variants == 0) {
                 // pass
             } else if (variants == 1) {
-                try {
-                    tokenStream = new ZhSynonymFilter(tokenStream);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            
+                tokenStream = new ZhSynonymFilter(tokenStream);
             } else if (variants == 2) {
-                try {
-                    tokenStream = new ZhAlternatesFilter(tokenStream);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            
+                tokenStream = new ZhAlternatesFilter(tokenStream);
             } else if (variants == 3) {
-                try {
-                    tokenStream = new ZhSynonymFilter(tokenStream);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-                try {
-                    tokenStream = new ZhAlternatesFilter(tokenStream);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }
+                tokenStream = new ZhSynonymFilter(tokenStream);
+                tokenStream = new ZhAlternatesFilter(tokenStream);
             }
         }
 
         /* indexing from TC to SC */
         if (this.indexEncoding.equals("SC") && this.inputEncoding.equals("TC")) {
-            try {
-                tokenStream = new TC2SCFilter(tokenStream);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-        
+            tokenStream = new TC2SCFilter(tokenStream);
         /* indexing from ideograms to pinyin */
         } else if (this.indexEncoding.startsWith("PY") && this.inputEncoding.endsWith("C")) {
-            try {
-                tokenStream = new ZhToPinyinFilter(tokenStream);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-            
+            tokenStream = new ZhToPinyinFilter(tokenStream);
             if (this.indexEncoding.equals("PYlazy")) {
                 tokenStream = new LazyPinyinFilter(tokenStream);
             }
@@ -289,20 +243,10 @@ public final class ChineseAnalyzer extends Analyzer {
         /* indexing from any encoding to PYlazy */
         if (this.inputEncoding.startsWith("PY")) {
             if (this.inputEncoding.equals("PYstrict") && this.indexEncoding.equals("PYstrict")) {
-                try {
-                    tokenStream = new PinyinNumberedToMarkedFilter(tok);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }
+                tokenStream = new PinyinNumberedToMarkedFilter(tok);
             } else if (this.indexEncoding.equals("PYlazy") && !this.inputEncoding.equals("PYlazy")) {
                 if (this.inputEncoding.equals("PYstrict")) {
-                    try {
-                        tokenStream = new PinyinNumberedToMarkedFilter(tok);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
+                    tokenStream = new PinyinNumberedToMarkedFilter(tok);
                     tokenStream = new LazyPinyinFilter(tokenStream);
                 } else {
                     tokenStream = new LazyPinyinFilter(tok);

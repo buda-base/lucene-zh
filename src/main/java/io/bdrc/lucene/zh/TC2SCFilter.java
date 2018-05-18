@@ -38,14 +38,12 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 public class TC2SCFilter extends TokenFilter {
 
-    private HashMap<String, String> map;
-
-    public TC2SCFilter(TokenStream in) throws IOException {
-        super(in);
-        map = CommonHelpers.getMappings("tc2sc.tsv");
-    }
-
+    private static final HashMap<String, String> map = CommonHelpers.getMappings("tc2sc.tsv");
     CharTermAttribute charTermAttribute = addAttribute(CharTermAttribute.class);
+
+    public TC2SCFilter(TokenStream in) {
+        super(in);
+    }
 
     @Override
     public final boolean incrementToken() throws IOException {

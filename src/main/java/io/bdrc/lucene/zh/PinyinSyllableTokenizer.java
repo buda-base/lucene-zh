@@ -1,9 +1,6 @@
 package io.bdrc.lucene.zh;
 
 import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.CharacterIterator;
@@ -52,16 +49,7 @@ import io.bdrc.lucene.stemmer.Trie;
  *
  */
 public class PinyinSyllableTokenizer extends Tokenizer{
-    private Trie scanner;
-    
-    /**
-     * 
-     * @throws FileNotFoundException 
-     * @throws IOException
-     */
-    PinyinSyllableTokenizer () throws FileNotFoundException, IOException {
-        init();
-    }
+    private static final Trie scanner = getTrie();
     
     private int bufferIndex = 0, finalOffset = 0;
     private static final int MAX_WORD_LEN = 255;
@@ -99,32 +87,24 @@ public class PinyinSyllableTokenizer extends Tokenizer{
     
     boolean debug = false;
     
-    /**
-     * 
-     * @throws FileNotFoundException  the file of the compiled Trie is not found
-     * @throws IOException  the file of the compiled Trie can't be opened
-     */
-    private void init() throws FileNotFoundException, IOException {
-        InputStream stream = CommonHelpers.getResourceOrFile(CompiledTrie.trieBaseFileName);
-        if (stream != null) {
-            init(stream);
-        } else {
-            logger.warn("could not find compiled trie, rebuilding it");
-            this.scanner = CompiledTrie.buildTrie();
-            ioBuffer = new RollingCharBuffer();
-            ioBuffer.reset(input);
-        }
-    }
-    
-    /**
-     * Opens an existing compiled Trie
-     * 
-     * @param inputStream the compiled Trie opened as a Stream 
-     */
-    private void init(InputStream inputStream) throws FileNotFoundException, IOException {
-        this.scanner = new Trie(new DataInputStream(inputStream));
+    PinyinSyllableTokenizer () {
         ioBuffer = new RollingCharBuffer();
         ioBuffer.reset(input);
+    }
+
+    
+    private static Trie getTrie() {
+        InputStream stream = CommonHelpers.getResourceOrFile(CompiledTrie.trieBaseFileName);
+        if (stream != null) {
+            try {
+                return new Trie(new DataInputStream(stream));
+            } catch (IOException e) {
+                logger.error("error in inputstream conversion for Trie", e);
+                return null;
+            }
+        } else {
+            return CompiledTrie.buildTrie();
+        }
     }
     
     /**

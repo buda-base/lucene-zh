@@ -40,14 +40,12 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 public class ZhAlternatesFilter extends TokenFilter {
 
-    private final HashMap<String, String> map;
-
-    public ZhAlternatesFilter(TokenStream in) throws IOException {
-        super(in);
-        map = CommonHelpers.getMappings("zh-alternatives.tsv");
-    }
-
+    private static final HashMap<String, String> map = CommonHelpers.getMappings("zh-alternatives.tsv");
     CharTermAttribute charTermAttribute = addAttribute(CharTermAttribute.class);
+    
+    public ZhAlternatesFilter(TokenStream in) {
+        super(in);
+    }
 
     @Override
     public final boolean incrementToken() throws IOException {

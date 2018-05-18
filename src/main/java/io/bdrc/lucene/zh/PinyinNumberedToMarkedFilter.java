@@ -60,7 +60,7 @@ public class PinyinNumberedToMarkedFilter extends TokenFilter {
         rows.put('ü', 5);
     }
     
-    public PinyinNumberedToMarkedFilter(TokenStream in) throws IOException {
+    public PinyinNumberedToMarkedFilter(TokenStream in) {
         super(in);
     }
 
@@ -72,7 +72,7 @@ public class PinyinNumberedToMarkedFilter extends TokenFilter {
      *          else returns the syllable as-is.
      */
     public static String numberedToMarked(String pinyinStr) {
-        char number = pinyinStr.charAt(pinyinStr.length()-1);
+        final char number = pinyinStr.charAt(pinyinStr.length()-1);
         /* there is a numbered tone and a pinyin vowel */
         if (toneNumbers.contains(number) && (pinyinStr.contains("a") || pinyinStr.contains("e")
                 || pinyinStr.contains("i") || pinyinStr.contains("o") || pinyinStr.contains("u")

@@ -39,7 +39,7 @@ public class CommonHelpers {
         }  
     }
     
-    public static final HashMap<String, String> getMappings (final String baseName) throws IOException {
+    public static final HashMap<String, String> getMappings (final String baseName) {
         final InputStream stream = CommonHelpers.getResourceOrFile(baseName);
         final HashMap<String, String> map = new HashMap<String, String>();
         if (stream == null) {
@@ -48,15 +48,20 @@ public class CommonHelpers {
         }
         final BufferedReader br = new BufferedReader(new InputStreamReader(stream));
         String line = null;
-        while ((line = br.readLine()) != null) {
-            final String[] parts = line.split("\t");
-            map.put(parts[0], parts[1]);
+        try {
+            while ((line = br.readLine()) != null) {
+                final String[] parts = line.split("\t");
+                map.put(parts[0], parts[1]);
+            }
+            br.close();
+        } catch (IOException e) {
+            logger.error("problem when reading "+baseName, e);
+            return map;
         }
-        br.close();
         return map;
     }
 
-    public final static NormalizeCharMap getNormalizeCharMap(final String baseName, boolean oneColumn) throws IOException {
+    public final static NormalizeCharMap getNormalizeCharMap(final String baseName, boolean oneColumn) {
         final InputStream stream = CommonHelpers.getResourceOrFile(baseName);
         final NormalizeCharMap.Builder builder = new NormalizeCharMap.Builder();
         if (stream == null) {
@@ -65,15 +70,20 @@ public class CommonHelpers {
         }
         final BufferedReader br = new BufferedReader(new InputStreamReader(stream));
         String line = null;
-        while ((line = br.readLine()) != null) {
-            if (oneColumn) {
-                builder.add(line, "");
-            } else {
-                final String[] parts= line.split("\t");
-                builder.add(parts[0], parts[1]);
+        try {
+            while ((line = br.readLine()) != null) {
+                if (oneColumn) {
+                    builder.add(line, "");
+                } else {
+                    final String[] parts= line.split("\t");
+                    builder.add(parts[0], parts[1]);
+                }
             }
+            br.close();
+        } catch (IOException e) {
+            logger.error("problem when reading "+baseName, e);
+            return builder.build();
         }
-        br.close();
         return builder.build();
     }
 }
