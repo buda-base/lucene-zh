@@ -16,6 +16,8 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.analysis.util.RollingCharBuffer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.bdrc.lucene.stemmer.Row;
 import io.bdrc.lucene.stemmer.Trie;
@@ -93,6 +95,8 @@ public class PinyinSyllableTokenizer extends Tokenizer{
     private StringCharacterIterator nonwordIterator = null;
     private int nonwordOffset = -1;
     
+    private static final Logger logger = LoggerFactory.getLogger(PinyinSyllableTokenizer.class);
+    
     boolean debug = false;
     
     /**
@@ -101,23 +105,14 @@ public class PinyinSyllableTokenizer extends Tokenizer{
      * @throws IOException  the file of the compiled Trie can't be opened
      */
     private void init() throws FileNotFoundException, IOException {
-        InputStream stream = null;
-        stream = PinyinSyllableTokenizer.class.getResourceAsStream("/zh_py-compiled-trie.dump");
-        if (stream == null) {  // we're not using the jar, there is no resource, assuming we're running the code
-            String compiledTrieName = "src/main/resources/zh_py-compiled-trie.dump";
-            if (!new File(compiledTrieName).exists()) {
-                System.out.println("The default compiled Trie is not found");
-                long start = System.currentTimeMillis();
-                this.scanner = BuildCompiledTrie.buildTrie();
-                long end = System.currentTimeMillis();
-                System.out.println("Trie built in " + (end - start) / 1000 + "s.");
-                ioBuffer = new RollingCharBuffer();
-                ioBuffer.reset(input);
-            } else {
-                init(new FileInputStream(compiledTrieName));    
-            }   
-        } else {
+        InputStream stream = CommonHelpers.getResourceOrFile(CompiledTrie.trieBaseFileName);
+        if (stream != null) {
             init(stream);
+        } else {
+            logger.warn("could not find compiled trie, rebuilding it");
+            this.scanner = CompiledTrie.buildTrie();
+            ioBuffer = new RollingCharBuffer();
+            ioBuffer.reset(input);
         }
     }
     

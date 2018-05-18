@@ -19,11 +19,7 @@
  ******************************************************************************/
 package io.bdrc.lucene.zh;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 
 import org.apache.lucene.analysis.TokenFilter;
@@ -42,33 +38,11 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 public class ZhToPinyinFilter extends TokenFilter {
 
-    private HashMap<String, String> map;
+    private final HashMap<String, String> map;
 
     public ZhToPinyinFilter(TokenStream in) throws IOException {
         super(in);
-        map = getMapping();
-    }
-
-    public final HashMap<String, String> getMapping() throws IOException {
-        String fileName = "src/main/resources/pinyin.tsv";
-        BufferedReader br;
-        InputStream stream = null;
-        stream = ZhToPinyinFilter.class.getResourceAsStream("/pinyin.tsv");
-        if (stream == null) { // we're not using the jar, these is no resource, assuming we're running the
-                              // code
-            br = new BufferedReader(new FileReader(fileName));
-        } else {
-            br = new BufferedReader(new InputStreamReader(stream));
-        }
-
-        final HashMap<String, String> map = new HashMap<String, String>();
-        String line = null;
-        while ((line = br.readLine()) != null) {
-            String[] parts = line.split("\t");
-            map.put(parts[0], parts[1]);
-        }
-        br.close();
-        return map;
+        map = CommonHelpers.getMappings("pinyin.tsv");
     }
 
     CharTermAttribute charTermAttribute = addAttribute(CharTermAttribute.class);
@@ -76,7 +50,7 @@ public class ZhToPinyinFilter extends TokenFilter {
     @Override
     public final boolean incrementToken() throws IOException {
         while (input.incrementToken()) {
-            String pinyin = map.get(charTermAttribute.toString());
+            final String pinyin = map.get(charTermAttribute.toString());
             if (pinyin != null) {
                 charTermAttribute.setEmpty().append(pinyin);
             }

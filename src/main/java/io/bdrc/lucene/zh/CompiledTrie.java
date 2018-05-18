@@ -12,18 +12,19 @@ import java.util.List;
 import io.bdrc.lucene.stemmer.Trie;
 import io.bdrc.lucene.stemmer.Reduce;
 
-public class BuildCompiledTrie {
-    static String outFile = "src/main/resources/zh_py-compiled-trie.dump";
+public class CompiledTrie {
 
+    public static final String trieBaseFileName = "zh_py-compiled-trie.dump";
+    public static final String trieFileName = CommonHelpers.baseDir+trieBaseFileName;
     
     public static void main(String [] args) throws FileNotFoundException, IOException{
-        storeTrie(buildTrie(), outFile);
+        storeTrie(buildTrie(), trieFileName);
     }
     
 
     public static Trie compileTrie() throws FileNotFoundException, IOException {
         Trie trie = buildTrie();
-        storeTrie(trie, outFile);
+        storeTrie(trie, trieFileName);
         return trie;
     }
     

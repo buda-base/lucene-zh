@@ -19,15 +19,10 @@
  ******************************************************************************/
 package io.bdrc.lucene.zh;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 
 import org.apache.lucene.analysis.charfilter.MappingCharFilter;
-import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
 
 /**
  * Traditional Chinese to Simplified Chinese charfilter 
@@ -41,27 +36,6 @@ import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
 public class ZhStopWordsFilter extends MappingCharFilter {
 
     public ZhStopWordsFilter(Reader in) throws IOException {
-        super(getCnNormalizeCharMap(), in);
-    }
-
-    public final static NormalizeCharMap getCnNormalizeCharMap() throws IOException {
-        String fileName = "src/main/resources/zh-stopwords.txt";
-        BufferedReader br;
-        InputStream stream = null;
-        stream = ZhStopWordsFilter.class.getResourceAsStream("/zh-stopwords.txt");
-        if (stream == null ) {    // we're not using the jar, these is no resource, assuming we're running the code
-             br = new BufferedReader(new FileReader(fileName));
-        } else {
-            br = new BufferedReader(new InputStreamReader(stream));
-        }
-
-        final NormalizeCharMap.Builder builder = new NormalizeCharMap.Builder();
-        String line = null;
-        while ((line = br.readLine()) != null) {
-            builder.add(line, "");  // we want to map all stopword sequences to nothing to delete them
-        }
-        br.close();
-
-        return builder.build();
+        super(CommonHelpers.getNormalizeCharMap("zh-stopwords.txt", true), in);
     }
 }
