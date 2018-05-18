@@ -181,7 +181,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>io.bdrc.lucene.zh.BuildCompiledTrie</mainClass>
+                    <mainClass>io.bdrc.lucene.zh.CompiledTrie</mainClass>
                 </configuration>
             </plugin>
             <plugin>
