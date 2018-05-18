@@ -5,7 +5,7 @@
   <artifactId>lucene-zh</artifactId>
   <packaging>jar</packaging>
   <name>lucene-zh</name>
-  <version>0.2.0</version>
+  <version>0.3.0</version>
   <description>Lucene analyzer and components for Buddhist Chinese</description>
   <url>https://github.com/BuddhistDigitalResourceCenter/lucene-zh</url>
     <licenses>
@@ -66,12 +66,6 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
             <version>${lucene.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queryparser</artifactId>
-            <version>${lucene.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
