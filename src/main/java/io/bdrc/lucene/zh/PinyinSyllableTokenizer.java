@@ -49,8 +49,6 @@ import io.bdrc.lucene.stemmer.Trie;
  *
  */
 public class PinyinSyllableTokenizer extends Tokenizer{
-    private static final Trie scanner = getTrie();
-    
     private int bufferIndex = 0, finalOffset = 0;
     private static final int MAX_WORD_LEN = 255;
     
@@ -84,8 +82,11 @@ public class PinyinSyllableTokenizer extends Tokenizer{
     private int nonwordOffset = -1;
     
     private static final Logger logger = LoggerFactory.getLogger(PinyinSyllableTokenizer.class);
-    
     boolean debug = false;
+    private static final Trie scanner;
+    static {
+        scanner = getTrie();
+    }
     
     PinyinSyllableTokenizer () {
         ioBuffer = new RollingCharBuffer();
