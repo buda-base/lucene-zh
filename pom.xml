@@ -5,7 +5,7 @@
   <artifactId>lucene-zh</artifactId>
   <packaging>jar</packaging>
   <name>lucene-zh</name>
-  <version>0.4.0</version>
+  <version>0.4.1</version>
   <description>Lucene analyzer and components for Buddhist Chinese</description>
   <url>https://github.com/BuddhistDigitalResourceCenter/lucene-zh</url>
     <licenses>
