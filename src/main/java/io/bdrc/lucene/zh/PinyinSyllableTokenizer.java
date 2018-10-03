@@ -272,13 +272,36 @@ public class PinyinSyllableTokenizer extends Tokenizer{
                 nonwordIterator  = new StringCharacterIterator(termAtt.toString());
                 termAtt.setLength(1);
                 nonwordOffset = tokenStart;
-                offsetAtt.setOffset(correctOffset(tokenStart), correctOffset(tokenStart + 1));
+                int initialOffset = correctOffset(tokenStart);
+                finalOffset = correctOffset(tokenStart + 1);
+                if (initialOffset < -1) {
+                    logger.warn("initialOffset incorrect. start: ", initialOffset, "end: ", finalOffset, 
+                            "string: ", tokenBuffer.toString());
+                    initialOffset = 0;
+                }
+                if (finalOffset < initialOffset) {
+                    logger.warn("finalOffset incorrect. start: ", initialOffset, "end: ", finalOffset, 
+                            "string: ", tokenBuffer.toString());
+                    finalOffset = initialOffset;
+                }
+                offsetAtt.setOffset(initialOffset, finalOffset);
                 return true;
             }
         }
         termAtt.setLength(tokenLength);
-        assert tokenStart != -1;
-        offsetAtt.setOffset(correctOffset(tokenStart), correctOffset(tokenEnd));
+        int initialOffset = correctOffset(tokenStart);
+        finalOffset = correctOffset(tokenEnd);
+        if (initialOffset < -1) {
+            logger.warn("initialOffset incorrect. start: ", initialOffset, "end: ", finalOffset, 
+                    "string: ", tokenBuffer.toString());
+            initialOffset = 0;
+        }
+        if (finalOffset < initialOffset) {
+            logger.warn("finalOffset incorrect. start: ", initialOffset, "end: ", finalOffset, 
+                    "string: ", tokenBuffer.toString());
+            finalOffset = initialOffset;
+        }
+        offsetAtt.setOffset(initialOffset, finalOffset);
         return true;
     }
     
