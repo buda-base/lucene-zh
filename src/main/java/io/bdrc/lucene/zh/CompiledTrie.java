@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.bdrc.lucene.stemmer.Trie;
-import io.bdrc.lucene.stemmer.Reduce;
 
 public class CompiledTrie {
 

@@ -35,6 +35,7 @@ import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.junit.Test;
 
 /**
@@ -54,10 +55,11 @@ public class ChineseComponentsTest  {
     
     static private void assertCharTokenStream(TokenStream tokenStream, List<String> expected) {
         try {
-            List<String> termList = new ArrayList<String>();
-            CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
+            final List<String> termList = new ArrayList<String>();
+            final CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
             while (tokenStream.incrementToken()) {
                 termList.add(charTermAttribute.toString() + charTermAttribute.length());
+                //System.out.println(charTermAttribute.toString()+" "+offsetAttribute.startOffset()+"-"+offsetAttribute.endOffset());
             }
             System.out.println("1 " + String.join(" ", expected));
             System.out.println("2 " + String.join(" ", termList) + "\n");
@@ -69,10 +71,12 @@ public class ChineseComponentsTest  {
     
     static private void assertTokenStream(TokenStream tokenStream, List<String> expected) {
         try {
-            List<String> termList = new ArrayList<String>();
-            CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
+            final List<String> termList = new ArrayList<String>();
+            final CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
+            final OffsetAttribute offsetAttribute = tokenStream.addAttribute(OffsetAttribute.class);
             while (tokenStream.incrementToken()) {
                 termList.add(charTermAttribute.toString());
+                System.out.println(charTermAttribute.toString()+" "+offsetAttribute.startOffset()+"-"+offsetAttribute.endOffset());
             }
             System.out.println("1 " + String.join(" ", expected));
             System.out.println("2 " + String.join(" ", termList) + "\n");

@@ -137,7 +137,7 @@ public class PinyinSyllableTokenizer extends Tokenizer{
     @Override
     public final boolean incrementToken() throws IOException {
         if (nonwordIterator != null) {
-            char next = nonwordIterator.next();
+            final char next = nonwordIterator.next();
             if (next != CharacterIterator.DONE) {
                 termAtt.setEmpty().append(next);
                 nonwordOffset ++;

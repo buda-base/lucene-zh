@@ -20,7 +20,7 @@
 package io.bdrc.lucene.zh;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -38,7 +38,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 public class ZhToPinyinFilter extends TokenFilter {
 
-    private static final HashMap<String, String> map = CommonHelpers.getMappings("pinyin.tsv");
+    private static final Map<String, String> map = CommonHelpers.getMappings("pinyin.tsv");
     CharTermAttribute charTermAttribute = addAttribute(CharTermAttribute.class);
 
     public ZhToPinyinFilter(TokenStream in) {
