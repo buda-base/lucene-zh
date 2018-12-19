@@ -1,4 +1,4 @@
-# Lucene Analyzers for Buddhist Chinese
+# Lucene Analyzers for Buddhist Chinese 
 
 This repository contains bricks to process Chinese in Lucene, mainly:
 - stopwords
