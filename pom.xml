@@ -5,7 +5,7 @@
   <artifactId>lucene-zh</artifactId>
   <packaging>jar</packaging>
   <name>lucene-zh</name>
-  <version>0.4.1</version>
+  <version>0.4.2</version>
   <description>Lucene analyzer and components for Buddhist Chinese</description>
   <url>https://github.com/BuddhistDigitalResourceCenter/lucene-zh</url>
     <licenses>
@@ -18,7 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <slf4j.version>1.7.25</slf4j.version>
+        <slf4j.version>1.7.36</slf4j.version>
         <lucene.version>8.11.1</lucene.version>
     </properties>
     <developers>
